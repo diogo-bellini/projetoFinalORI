@@ -8,5 +8,5 @@
 *.njsproj
 *.sln
 *.sw?
-.csv
+*.csv
 corous.csv
