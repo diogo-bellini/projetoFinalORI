@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-#define SLOTS 5
+#include "ArvoreAVL.h"
 
 //Protótipos
 
