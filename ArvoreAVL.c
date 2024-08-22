@@ -3,10 +3,11 @@
 #include <string.h>
 #include "ArvoreAVL.h" //inclui os Prot�tipos
 
-ArvAVL* cria_ArvAVL(){
-    ArvAVL* raiz = (ArvAVL*) malloc(sizeof(ArvAVL));
-    if(raiz != NULL)
+ArvAVL* cria_ArvAVL() {
+    ArvAVL* raiz = (ArvAVL*)malloc(sizeof(struct NO*));
+    if (raiz != NULL) {
         *raiz = NULL;
+    }
     return raiz;
 }
 
@@ -174,4 +175,15 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn){
     atual->altura = maior(altura_NO(atual->esq),altura_NO(atual->dir)) + 1;
 
     return res;
+}
+
+void imprimir_ArvAVL(ArvAVL *raiz){
+    if(raiz == NULL)
+        return;
+    if(*raiz != NULL){
+        imprimir_ArvAVL(&((*raiz)->esq));
+        //printf("%d\n",(*raiz)->info);
+        printf("No %s: H(%d) fb(%d)\n",(*raiz)->word,altura_NO(*raiz),fatorBalanceamento_NO(*raiz));
+        imprimir_ArvAVL(&((*raiz)->dir));
+    }
 }
