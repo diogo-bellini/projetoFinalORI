@@ -155,7 +155,7 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn){
         if(strcmp(valor, atual->word) > 0){
             if((res = insere_ArvAVL(&(atual->dir), valor, rrn)) == 1){
                 if(fatorBalanceamento_NO(atual) >= 2){
-                    if(strcmp((*raiz)->dir->word, valor) > 0){
+                    if(strcmp(valor, (*raiz)->dir->word) > 0){
                         RotacaoRR(raiz);
                     }else{
                         RotacaoRL(raiz);
