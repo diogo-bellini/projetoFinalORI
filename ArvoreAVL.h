@@ -16,4 +16,4 @@ void libera_ArvAVL(ArvAVL *raiz);
 int insere_ArvAVL(ArvAVL *raiz, char* data, int rrn);
 int* consulta_ArvAVL(ArvAVL raiz, char* valor);
 
-void imprimir_ArvAVL(ArvAVL *raiz);
+// void imprimir_ArvAVL(ArvAVL *raiz);

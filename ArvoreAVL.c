@@ -4,10 +4,12 @@
 #include "ArvoreAVL.h" //inclui os Prot�tipos
 
 ArvAVL* cria_ArvAVL() {
-    ArvAVL* raiz = (ArvAVL*)malloc(sizeof(struct NO*));
+    ArvAVL* raiz = (ArvAVL*)malloc(sizeof(ArvAVL));
     if (raiz != NULL) {
         *raiz = NULL;
     }
+
+    printf("Arvore alocada\n");
     return raiz;
 }
 
@@ -26,6 +28,7 @@ void libera_ArvAVL(ArvAVL* raiz){
     if(raiz == NULL)
         return;
     libera_NO(*raiz);//libera cada n�
+    *raiz = NULL;
     free(raiz);//libera a raiz
 }
 
@@ -105,6 +108,8 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn){
         novo = (struct NO*)malloc(sizeof(struct NO));
         if(novo == NULL){
             return 0;
+        }else{
+            printf("Novo nó alocado\n");
         }
 
         novo->word = (char*) malloc(strlen(valor) + 1); // Aloca memória para a word
@@ -114,6 +119,7 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn){
         }
 
         strcpy(novo->word, valor);
+        printf("Inserido: %s\n", novo->word);
         novo->altura = 0;
         novo->esq = NULL;
         novo->dir = NULL;
@@ -166,6 +172,7 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn){
                 }
             }
             atual->vetor_rrn[atual->num_rrn] = rrn;
+            printf("Novo RRN\n");
             atual->num_rrn++;
 
             return 1;
@@ -177,13 +184,13 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn){
     return res;
 }
 
-void imprimir_ArvAVL(ArvAVL *raiz){
-    if(raiz == NULL)
-        return;
-    if(*raiz != NULL){
-        imprimir_ArvAVL(&((*raiz)->esq));
-        //printf("%d\n",(*raiz)->info);
-        printf("No %s: H(%d) fb(%d)\n",(*raiz)->word,altura_NO(*raiz),fatorBalanceamento_NO(*raiz));
-        imprimir_ArvAVL(&((*raiz)->dir));
-    }
-}
+// void imprimir_ArvAVL(ArvAVL *raiz){
+//     if(raiz == NULL)
+//         return;
+//     if(*raiz != NULL){
+//         imprimir_ArvAVL(&((*raiz)->esq));
+//         //printf("%d\n",(*raiz)->info);
+//         printf("No %s: H(%d) fb(%d)\n",(*raiz)->word,altura_NO(*raiz),fatorBalanceamento_NO(*raiz));
+//         imprimir_ArvAVL(&((*raiz)->dir));
+//     }
+// }
