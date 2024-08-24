@@ -31,7 +31,7 @@ int main(){
     init_hash(&minhaTabela);
     printf("CCCCCCC\n");
 
-    FILE* f = fopen("/Users/diogobellini/Desktop/UFSCar/ORI/projetoFinalORI/teste.txt","r");
+    FILE* f = fopen("teste.txt","r");
     if (!f)
     {
         printf("Erro ao abrir o arquivo!!");
@@ -81,12 +81,13 @@ void libera_hash(hash_table* t){
     free(t->vetor);
 }
 
-int funcao_hash(char* word, hash_table* t){
-    unsigned long numero = 0;  // Usar unsigned long para evitar problemas com valores negativos
-    int peso = 1;
+int funcao_hash(char* word, hash_table* t) {
+    unsigned long numero = 0;
+    size_t len = strlen(word);
 
-    for (size_t i = 0; i < strlen(word); i++) {
-        numero = numero * 31 + (unsigned char)word[i];
+    for (size_t i = 0; i < len; i++) {
+        // Multiplicando o valor do caractere pelo seu índice + 1 para dar peso à posição
+        numero += (unsigned char)word[i] * (i + 1);
     }
 
     // Garantir que o número gerado esteja dentro dos limites da tabela
