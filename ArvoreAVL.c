@@ -9,7 +9,7 @@ ArvAVL* cria_ArvAVL() {
         *raiz = NULL;
     }
 
-    printf("Arvore alocada\n");
+    //printf("Arvore alocada\n");
     return raiz;
 }
 
@@ -108,9 +108,10 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn){
         novo = (struct NO*)malloc(sizeof(struct NO));
         if(novo == NULL){
             return 0;
-        }else{
-            printf("Novo nó alocado\n");
         }
+        // else{
+        //     printf("Novo nó alocado\n");
+        // }
 
         novo->word = (char*) malloc(strlen(valor) + 1); // Aloca memória para a word
         if (novo->word == NULL) {
@@ -119,7 +120,7 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn){
         }
 
         strcpy(novo->word, valor);
-        printf("Inserido: %s\n", novo->word);
+        // printf("Inserido: %s\n", novo->word);
         novo->altura = 0;
         novo->esq = NULL;
         novo->dir = NULL;
@@ -172,7 +173,7 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn){
                 }
             }
             atual->vetor_rrn[atual->num_rrn] = rrn;
-            printf("Novo RRN\n");
+            // printf("Novo RRN\n");
             atual->num_rrn++;
 
             return 1;
@@ -183,14 +184,3 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn){
 
     return res;
 }
-
-// void imprimir_ArvAVL(ArvAVL *raiz){
-//     if(raiz == NULL)
-//         return;
-//     if(*raiz != NULL){
-//         imprimir_ArvAVL(&((*raiz)->esq));
-//         //printf("%d\n",(*raiz)->info);
-//         printf("No %s: H(%d) fb(%d)\n",(*raiz)->word,altura_NO(*raiz),fatorBalanceamento_NO(*raiz));
-//         imprimir_ArvAVL(&((*raiz)->dir));
-//     }
-// }

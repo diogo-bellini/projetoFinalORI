@@ -5,7 +5,7 @@
 #include "ArvoreAVL.h"
 
 #define SLOTS 10
-#define MAX_LINE_LENGHT 3000
+#define MAX_LINE_LENGHT 350
 
 typedef struct
 {
@@ -20,16 +20,10 @@ int funcao_hash(char*, hash_table*);
 void processa_arquivo(FILE*, hash_table*);
 void insere_tabela(hash_table*, char*, int);
 
-//void imprimir_tabela(hash_table* t);
-
 //Função principal
 int main(){
-
-    printf("aaaaaaaaaaa\n");
     hash_table minhaTabela;
-    printf("BBBBB\n");
     init_hash(&minhaTabela);
-    printf("CCCCCCC\n");
 
     FILE* f = fopen("teste.txt","r");
     if (!f)
@@ -38,17 +32,39 @@ int main(){
         libera_hash(&minhaTabela);
         return -1;
     }
-    else
-    {
-        printf("Arquivo aberto com sucesso\n");
-    }
+    // else
+    // {
+    //     printf("Arquivo aberto com sucesso\n");
+    // }
 
     processa_arquivo(f, &minhaTabela);
 
+    int opcao = -1;
+
+    while (opcao != 0)
+    {
+        printf("\nEscolha o que deseja fazer:\n0. Sair\n1. Pesquisar\n");
+        scanf("%d", &opcao);
+
+        switch (opcao)
+        {
+        case 1:
+            //lógica de pesquisa
+            break;
+        
+        case 0:
+            printf("\nSaindo...\n");
+            break;
+        default:
+            printf("\nOpção Inválida\n");
+            break;
+        }
+    }
+    
     fclose(f);
 
-    //imprimir_tabela(&minhaTabela);
     libera_hash(&minhaTabela);
+
     return 0;
 }
 
@@ -59,9 +75,9 @@ void init_hash(hash_table* t) {
     if (t->vetor == NULL) {
         exit(1);
     }
-    else{
-        printf("Tabela hash inicializada com %d slots\n", t->m);
-    }
+    // else{
+    //     printf("Tabela hash inicializada com %d slots\n", t->m);
+    // }
 
     // Inicialize cada ponteiro no array
     for (int i = 0; i < t->m; i++) {
@@ -111,7 +127,7 @@ void processa_arquivo(FILE* f, hash_table* t){
 
     while (fgets(linha, sizeof(linha), f))
     {
-        printf("Linha lida\n");
+        //printf("Linha lida\n");
         linha[strcspn(linha, "\n")] = '\0';
         
         linha_inicial = ftell(f) - strlen(linha);
@@ -120,17 +136,17 @@ void processa_arquivo(FILE* f, hash_table* t){
 
         sscanf(linha, "%*d,%*d,%[^\n]", postagem);
 
-        if (strcmp(postagem, ""))
-        {
-            printf("Postagem check\n");
-        }
+        // if (strcmp(postagem, ""))
+        // {
+        //     printf("Postagem check\n");
+        // }
         
         rrn = linha_inicial + (strlen(linha) - strlen(postagem));
 
-        if (rrn != 0)
-        {
-            printf("RRN check\n");
-        }
+        // if (rrn != 0)
+        // {
+        //     printf("RRN check\n");
+        // }
         
         char* token = strtok(postagem, " ,.!?");
         while (token != NULL)
@@ -152,17 +168,8 @@ void processa_arquivo(FILE* f, hash_table* t){
             token = strtok(NULL, " ,.!?");
         }
     }
-    printf("Fim do arquivo\n");
+    //printf("Fim do arquivo\n");
 }
-
-// void imprimir_tabela(hash_table* t) {
-//     for (int i = 0; i < t->m; i++) {
-//         printf("Slot %d:\n", i);
-//         imprimir_ArvAVL(t->vetor[i]);
-//         printf("\n");
-//     }
-// }
-
 
 
 

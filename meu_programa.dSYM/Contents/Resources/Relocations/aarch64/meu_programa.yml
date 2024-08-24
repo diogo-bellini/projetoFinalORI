@@ -2,24 +2,24 @@
 triple:          'arm64-apple-darwin'
 binary-path:     meu_programa
 relocations:
-  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _cria_ArvAVL, symObjAddr: 0x0, symBinAddr: 0x100002DC0, symSize: 0x54 }
-  - { offsetInCU: 0xC4, offset: 0xC4, size: 0x8, addend: 0x0, symName: _cria_ArvAVL, symObjAddr: 0x0, symBinAddr: 0x100002DC0, symSize: 0x54 }
-  - { offsetInCU: 0xEC, offset: 0xEC, size: 0x8, addend: 0x0, symName: _libera_NO, symObjAddr: 0x54, symBinAddr: 0x100002E14, symSize: 0x74 }
-  - { offsetInCU: 0x110, offset: 0x110, size: 0x8, addend: 0x0, symName: _libera_ArvAVL, symObjAddr: 0xC8, symBinAddr: 0x100002E88, symSize: 0x54 }
-  - { offsetInCU: 0x134, offset: 0x134, size: 0x8, addend: 0x0, symName: _altura_NO, symObjAddr: 0x11C, symBinAddr: 0x100002EDC, symSize: 0x44 }
-  - { offsetInCU: 0x15C, offset: 0x15C, size: 0x8, addend: 0x0, symName: _fatorBalanceamento_NO, symObjAddr: 0x160, symBinAddr: 0x100002F20, symSize: 0x50 }
-  - { offsetInCU: 0x184, offset: 0x184, size: 0x8, addend: 0x0, symName: _maior, symObjAddr: 0x1B0, symBinAddr: 0x100002F70, symSize: 0x48 }
-  - { offsetInCU: 0x1BA, offset: 0x1BA, size: 0x8, addend: 0x0, symName: _consulta_ArvAVL, symObjAddr: 0x1F8, symBinAddr: 0x100002FB8, symSize: 0xD8 }
-  - { offsetInCU: 0x21A, offset: 0x21A, size: 0x8, addend: 0x0, symName: _RotacaoLL, symObjAddr: 0x2D0, symBinAddr: 0x100003090, symSize: 0xC4 }
-  - { offsetInCU: 0x24C, offset: 0x24C, size: 0x8, addend: 0x0, symName: _RotacaoRR, symObjAddr: 0x394, symBinAddr: 0x100003154, symSize: 0xC4 }
-  - { offsetInCU: 0x27E, offset: 0x27E, size: 0x8, addend: 0x0, symName: _RotacaoLR, symObjAddr: 0x458, symBinAddr: 0x100003218, symSize: 0x34 }
-  - { offsetInCU: 0x2A2, offset: 0x2A2, size: 0x8, addend: 0x0, symName: _RotacaoRL, symObjAddr: 0x48C, symBinAddr: 0x10000324C, symSize: 0x34 }
-  - { offsetInCU: 0x2C6, offset: 0x2C6, size: 0x8, addend: 0x0, symName: _insere_ArvAVL, symObjAddr: 0x4C0, symBinAddr: 0x100003280, symSize: 0x3F0 }
-  - { offsetInCU: 0x26, offset: 0x368, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x100003670, symSize: 0xD0 }
-  - { offsetInCU: 0xD1, offset: 0x413, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x100003670, symSize: 0xD0 }
-  - { offsetInCU: 0x107, offset: 0x449, size: 0x8, addend: 0x0, symName: _init_hash, symObjAddr: 0xD0, symBinAddr: 0x100003740, symSize: 0x118 }
-  - { offsetInCU: 0x147, offset: 0x489, size: 0x8, addend: 0x0, symName: _libera_hash, symObjAddr: 0x1E8, symBinAddr: 0x100003858, symSize: 0x74 }
-  - { offsetInCU: 0x187, offset: 0x4C9, size: 0x8, addend: 0x0, symName: _processa_arquivo, symObjAddr: 0x25C, symBinAddr: 0x1000038CC, symSize: 0x328 }
-  - { offsetInCU: 0x231, offset: 0x573, size: 0x8, addend: 0x0, symName: _funcao_hash, symObjAddr: 0x584, symBinAddr: 0x100003BF4, symSize: 0xBC }
-  - { offsetInCU: 0x29F, offset: 0x5E1, size: 0x8, addend: 0x0, symName: _insere_tabela, symObjAddr: 0x640, symBinAddr: 0x100003CB0, symSize: 0xA4 }
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _cria_ArvAVL, symObjAddr: 0x0, symBinAddr: 0x100002ED0, symSize: 0x48 }
+  - { offsetInCU: 0xBD, offset: 0xBD, size: 0x8, addend: 0x0, symName: _cria_ArvAVL, symObjAddr: 0x0, symBinAddr: 0x100002ED0, symSize: 0x48 }
+  - { offsetInCU: 0xE5, offset: 0xE5, size: 0x8, addend: 0x0, symName: _libera_NO, symObjAddr: 0x48, symBinAddr: 0x100002F18, symSize: 0x74 }
+  - { offsetInCU: 0x109, offset: 0x109, size: 0x8, addend: 0x0, symName: _libera_ArvAVL, symObjAddr: 0xBC, symBinAddr: 0x100002F8C, symSize: 0x54 }
+  - { offsetInCU: 0x12D, offset: 0x12D, size: 0x8, addend: 0x0, symName: _altura_NO, symObjAddr: 0x110, symBinAddr: 0x100002FE0, symSize: 0x44 }
+  - { offsetInCU: 0x155, offset: 0x155, size: 0x8, addend: 0x0, symName: _fatorBalanceamento_NO, symObjAddr: 0x154, symBinAddr: 0x100003024, symSize: 0x50 }
+  - { offsetInCU: 0x17D, offset: 0x17D, size: 0x8, addend: 0x0, symName: _maior, symObjAddr: 0x1A4, symBinAddr: 0x100003074, symSize: 0x48 }
+  - { offsetInCU: 0x1B3, offset: 0x1B3, size: 0x8, addend: 0x0, symName: _consulta_ArvAVL, symObjAddr: 0x1EC, symBinAddr: 0x1000030BC, symSize: 0xD8 }
+  - { offsetInCU: 0x213, offset: 0x213, size: 0x8, addend: 0x0, symName: _RotacaoLL, symObjAddr: 0x2C4, symBinAddr: 0x100003194, symSize: 0xC4 }
+  - { offsetInCU: 0x245, offset: 0x245, size: 0x8, addend: 0x0, symName: _RotacaoRR, symObjAddr: 0x388, symBinAddr: 0x100003258, symSize: 0xC4 }
+  - { offsetInCU: 0x277, offset: 0x277, size: 0x8, addend: 0x0, symName: _RotacaoLR, symObjAddr: 0x44C, symBinAddr: 0x10000331C, symSize: 0x34 }
+  - { offsetInCU: 0x29B, offset: 0x29B, size: 0x8, addend: 0x0, symName: _RotacaoRL, symObjAddr: 0x480, symBinAddr: 0x100003350, symSize: 0x34 }
+  - { offsetInCU: 0x2BF, offset: 0x2BF, size: 0x8, addend: 0x0, symName: _insere_ArvAVL, symObjAddr: 0x4B4, symBinAddr: 0x100003384, symSize: 0x3B8 }
+  - { offsetInCU: 0x26, offset: 0x361, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x10000373C, symSize: 0x130 }
+  - { offsetInCU: 0xD1, offset: 0x40C, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x10000373C, symSize: 0x130 }
+  - { offsetInCU: 0x115, offset: 0x450, size: 0x8, addend: 0x0, symName: _init_hash, symObjAddr: 0x130, symBinAddr: 0x10000386C, symSize: 0xF4 }
+  - { offsetInCU: 0x155, offset: 0x490, size: 0x8, addend: 0x0, symName: _libera_hash, symObjAddr: 0x224, symBinAddr: 0x100003960, symSize: 0x74 }
+  - { offsetInCU: 0x195, offset: 0x4D0, size: 0x8, addend: 0x0, symName: _processa_arquivo, symObjAddr: 0x298, symBinAddr: 0x1000039D4, symSize: 0x2A8 }
+  - { offsetInCU: 0x23F, offset: 0x57A, size: 0x8, addend: 0x0, symName: _funcao_hash, symObjAddr: 0x540, symBinAddr: 0x100003C7C, symSize: 0xA4 }
+  - { offsetInCU: 0x2AD, offset: 0x5E8, size: 0x8, addend: 0x0, symName: _insere_tabela, symObjAddr: 0x5E4, symBinAddr: 0x100003D20, symSize: 0xA4 }
 ...
