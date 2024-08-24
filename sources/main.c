@@ -32,10 +32,6 @@ int main(){
         libera_hash(&minhaTabela);
         return -1;
     }
-    // else
-    // {
-    //     printf("Arquivo aberto com sucesso\n");
-    // }
 
     processa_arquivo(f, &minhaTabela);
 
@@ -122,7 +118,7 @@ void insere_tabela(hash_table* t, char* word, int rrn){
 void processa_arquivo(FILE* f, hash_table* t){
     char linha[MAX_LINE_LENGHT];
 
-    long int linha_inicial;
+    //long int linha_inicial;
     int rrn = 0;
 
     while (fgets(linha, sizeof(linha), f))
@@ -130,18 +126,18 @@ void processa_arquivo(FILE* f, hash_table* t){
         //printf("Linha lida\n");
         linha[strcspn(linha, "\n")] = '\0';
         
-        linha_inicial = ftell(f) - strlen(linha);
+        //linha_inicial = ftell(f) - strlen(linha);
 
         char postagem[MAX_LINE_LENGHT -4];
 
-        sscanf(linha, "%*d,%*d,%[^\n]", postagem);
+        sscanf(linha, "%d,%*d,%[^\n]", &rrn, postagem);
 
         // if (strcmp(postagem, ""))
         // {
         //     printf("Postagem check\n");
         // }
         
-        rrn = linha_inicial + (strlen(linha) - strlen(postagem));
+        //rrn = linha_inicial + (strlen(linha) - strlen(postagem));
 
         // if (rrn != 0)
         // {
@@ -170,6 +166,3 @@ void processa_arquivo(FILE* f, hash_table* t){
     }
     //printf("Fim do arquivo\n");
 }
-
-
-
