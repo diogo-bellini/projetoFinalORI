@@ -101,7 +101,7 @@ void RotacaoRL(ArvAVL *A){//RL
     RotacaoRR(A);
 }
 
-int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn){
+int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn, int tamanho){
     int res;
     if(*raiz == NULL){//�rvore vazia ou n� folha
         struct NO *novo;
@@ -133,7 +133,15 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn){
             free(novo);
             return 0;
         }
+        novo->tamanho_postagem  = (int*)malloc(sizeof(int) * novo->capacidade_rrn);
+        if (novo->tamanho_postagem == NULL) {
+            free(novo->word);
+            free(novo->vetor_rrn);
+            free(novo);
+            return 0;
+        }
         novo->vetor_rrn[0] = rrn;
+        novo->tamanho_postagem[0] = tamanho;
 
         *raiz = novo;
         return 1;
@@ -141,7 +149,7 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn){
 
     struct NO *atual = *raiz;
     if(strcmp(valor, atual->word) < 0){
-        if((res = insere_ArvAVL(&(atual->esq), valor, rrn)) == 1){
+        if((res = insere_ArvAVL(&(atual->esq), valor, rrn, tamanho)) == 1){
             if(fatorBalanceamento_NO(atual) >= 2){
                 if(strcmp(valor, (*raiz)->esq->word) < 0){
                     RotacaoLL(raiz);
@@ -154,7 +162,7 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn){
     else
     {
         if(strcmp(valor, atual->word) > 0){
-            if((res = insere_ArvAVL(&(atual->dir), valor, rrn)) == 1){
+            if((res = insere_ArvAVL(&(atual->dir), valor, rrn, tamanho)) == 1){
                 if(fatorBalanceamento_NO(atual) >= 2){
                     if(strcmp(valor, (*raiz)->dir->word) > 0){
                         RotacaoRR(raiz);
@@ -171,8 +179,13 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn){
                 if (atual->vetor_rrn == NULL){
                     return 0;
                 }
+                atual->tamanho_postagem = (int*)realloc(atual->tamanho_postagem, sizeof(int) * atual->capacidade_rrn);
+                if (atual->tamanho_postagem == NULL){
+                    return 0;
+                }
             }
             atual->vetor_rrn[atual->num_rrn] = rrn;
+            atual->tamanho_postagem[atual->num_rrn] = tamanho;
             // printf("Novo RRN\n");
             atual->num_rrn++;
 

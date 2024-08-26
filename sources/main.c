@@ -18,7 +18,7 @@ void init_hash(hash_table*);
 void libera_hash(hash_table*);
 int funcao_hash(char*, hash_table*);
 void processa_arquivo(FILE*, hash_table*);
-void insere_tabela(hash_table*, char*, int);
+void insere_tabela(hash_table*, char*, int, int);
 
 //Função principal
 int main(){
@@ -32,6 +32,10 @@ int main(){
         libera_hash(&minhaTabela);
         return -1;
     }
+    // else
+    // {
+    //     printf("Arquivo aberto com sucesso\n");
+    // }
 
     processa_arquivo(f, &minhaTabela);
 
@@ -106,19 +110,19 @@ int funcao_hash(char* word, hash_table* t) {
     return numero % t->m;
 }
 
-void insere_tabela(hash_table* t, char* word, int rrn){
+void insere_tabela(hash_table* t, char* word, int rrn, int tamanho){
     int index = funcao_hash(word, t);
     if (index < 0 || index >= t->m) {
         printf("Índice inválido na tabela hash: %d\n", index);
         return;
     }
-    insere_ArvAVL(t->vetor[index], word, rrn);
+    insere_ArvAVL(t->vetor[index], word, rrn, tamanho);
 }
 
 void processa_arquivo(FILE* f, hash_table* t){
     char linha[MAX_LINE_LENGHT];
 
-    //long int linha_inicial;
+    long int linha_inicial;
     int rrn = 0;
 
     while (fgets(linha, sizeof(linha), f))
@@ -126,18 +130,18 @@ void processa_arquivo(FILE* f, hash_table* t){
         //printf("Linha lida\n");
         linha[strcspn(linha, "\n")] = '\0';
         
-        //linha_inicial = ftell(f) - strlen(linha);
+        linha_inicial = ftell(f) - strlen(linha);
 
         char postagem[MAX_LINE_LENGHT -4];
 
-        sscanf(linha, "%d,%*d,%[^\n]", &rrn, postagem);
+        sscanf(linha, "%*d,%*d,%[^\n]", postagem);
 
         // if (strcmp(postagem, ""))
         // {
         //     printf("Postagem check\n");
         // }
         
-        //rrn = linha_inicial + (strlen(linha) - strlen(postagem));
+        rrn = linha_inicial + (strlen(linha) - strlen(postagem));
 
         // if (rrn != 0)
         // {
@@ -158,7 +162,7 @@ void processa_arquivo(FILE* f, hash_table* t){
 
             if (strlen(token) > 0)
             {
-                insere_tabela(t, token, rrn);
+                insere_tabela(t, token, rrn, strlen(postagem));
                 //printf("Inserido: %s\n", token);
             }
             token = strtok(NULL, " ,.!?");
@@ -166,3 +170,6 @@ void processa_arquivo(FILE* f, hash_table* t){
     }
     //printf("Fim do arquivo\n");
 }
+
+
+
