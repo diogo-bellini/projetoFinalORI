@@ -50,14 +50,14 @@ int maior(int x, int y){
         return y;
 }
 
-int* consulta_ArvAVL(ArvAVL raiz, char* valor) {
+ArvAVL consulta_ArvAVL(ArvAVL raiz, char* valor) {
     if (raiz == NULL)
         return NULL;
     struct NO* atual = raiz;
     while (atual != NULL) {
         int cmp = strcmp(valor, atual->word);
         if (cmp == 0) {
-            return atual->vetor_rrn; // Palavra encontrada
+            return atual; // Palavra encontrada
         }
         if (cmp > 0) {
             atual = atual->dir; // Palavra é maior, vá para a direita

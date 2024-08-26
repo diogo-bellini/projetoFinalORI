@@ -170,6 +170,3 @@ void processa_arquivo(FILE* f, hash_table* t){
     }
     //printf("Fim do arquivo\n");
 }
-
-
-
