@@ -19,11 +19,18 @@ void libera_hash(hash_table*);
 int funcao_hash(char*, hash_table*);
 void processa_arquivo(FILE*, hash_table*);
 void insere_tabela(hash_table*, char*, int, int);
+void remover_parenteses(char*);
+void trim_spaces(char *);
 
 //Função principal
 int main(){
     hash_table minhaTabela;
     init_hash(&minhaTabela);
+
+    char input[MAX_LINE_LENGHT];
+    int index, i = 0;
+    char* argumentos[MAX_LINE_LENGHT];
+    ArvAVL no;
 
     FILE* f = fopen("teste.txt","r");
     if (!f)
@@ -50,6 +57,41 @@ int main(){
         {
         case 1:
             //lógica de pesquisa
+            printf("Escreva sua pesquisa:\n");
+            while (getchar() != '\n'); // Limpar o buffer de entrada
+
+            if (fgets(input, sizeof(input), stdin) != NULL)
+            {
+                input[strcspn(input, "\n")] = '\0';
+                remover_parenteses(input);
+                trim_spaces(input);
+
+                char *token = strtok(input, " ");
+                while (token != NULL)
+                {  
+                    argumentos[i] = token;
+                    i++;
+                    token = strtok(NULL, " ");
+                }
+                argumentos[i] = NULL;
+
+                
+
+                //index = funcao_hash(input, &minhaTabela);
+
+                // no = consulta_ArvAVL(*minhaTabela.vetor[index] , input);
+                // if(no != NULL){
+                //     printf("RRN nó: %d\n", no->vetor_rrn[0]); 
+                // }
+                
+                
+
+            }
+            else
+            {
+                printf("Erro ao ler a entrada, tente novamente!!!\n");
+            }
+
             break;
         
         case 0:
@@ -132,6 +174,8 @@ void processa_arquivo(FILE* f, hash_table* t){
         
         linha_inicial = ftell(f) - strlen(linha);
 
+        //printf("Linha inicial: %ld\n", linha_inicial);
+
         char postagem[MAX_LINE_LENGHT -4];
 
         sscanf(linha, "%*d,%*d,%[^\n]", postagem);
@@ -142,6 +186,8 @@ void processa_arquivo(FILE* f, hash_table* t){
         // }
         
         rrn = linha_inicial + (strlen(linha) - strlen(postagem));
+
+        //printf("RRn: %d\n", rrn);
 
         // if (rrn != 0)
         // {
@@ -170,3 +216,87 @@ void processa_arquivo(FILE* f, hash_table* t){
     }
     //printf("Fim do arquivo\n");
 }
+
+void remover_parenteses(char* str) {
+    int i, j = 0;
+    int tamanho = strlen(str);
+
+    for (i = 0; i < tamanho; i++) {
+        if (str[i] != '(' && str[i] != ')') {
+            str[j++] = str[i];  // Copia o caractere se não for '(' ou ')'
+        }
+    }
+    str[j] = '\0';  // Termina a string
+}
+
+// Função para remover espaços extras de uma string
+void trim_spaces(char *str) {
+    char *end;
+
+    // Remover espaços à esquerda
+    while (isspace((unsigned char)*str)) str++;
+
+    // Se a string está vazia
+    if (*str == 0)
+        return;
+
+    // Remover espaços à direita
+    end = str + strlen(str) - 1;
+    while (end > str && isspace((unsigned char)*end)) end--;
+
+    // Null-terminate a string
+    *(end + 1) = 0;
+}
+
+// typedef struct {
+//     int vetor_rrn[MAX_VETOR];
+//     int tamanho;
+// } ResultadoBusca;
+
+// ResultadoBusca realizar_operacao(ResultadoBusca r1, ResultadoBusca r2, char operador) {
+//     ResultadoBusca resultado;
+//     int i, j;
+//     resultado.tamanho = 0;
+
+//     if (operador == 'A') { // AND
+//         for (i = 0; i < r1.tamanho; i++) {
+//             for (j = 0; j < r2.tamanho; j++) {
+//                 if (r1.vetor_rrn[i] == r2.vetor_rrn[j]) {
+//                     resultado.vetor_rrn[resultado.tamanho++] = r1.vetor_rrn[i];
+//                     break;
+//                 }
+//             }
+//         }
+//     } else if (operador == 'O') { // OR
+//         for (i = 0; i < r1.tamanho; i++) {
+//             resultado.vetor_rrn[resultado.tamanho++] = r1.vetor_rrn[i];
+//         }
+//         for (i = 0; i < r2.tamanho; i++) {
+//             int existe = 0;
+//             for (j = 0; j < r1.tamanho; j++) {
+//                 if (r2.vetor_rrn[i] == r1.vetor_rrn[j]) {
+//                     existe = 1;
+//                     break;
+//                 }
+//             }
+//             if (!existe) {
+//                 resultado.vetor_rrn[resultado.tamanho++] = r2.vetor_rrn[i];
+//             }
+//         }
+//     } else if (operador == 'N') { // NOT
+//         for (i = 0; i < r1.tamanho; i++) {
+//             int existe = 0;
+//             for (j = 0; j < r2.tamanho; j++) {
+//                 if (r1.vetor_rrn[i] == r2.vetor_rrn[j]) {
+//                     existe = 1;
+//                     break;
+//                 }
+//             }
+//             if (!existe) {
+//                 resultado.vetor_rrn[resultado.tamanho++] = r1.vetor_rrn[i];
+//             }
+//         }
+//     }
+
+//     return resultado;
+// }
