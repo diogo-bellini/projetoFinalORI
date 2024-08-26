@@ -13,6 +13,11 @@ typedef struct
     ArvAVL** vetor;
 }hash_table;
 
+// typedef struct{
+//     int** rrns;
+//     int** tamanhos;
+// };
+
 //Protótipos
 void init_hash(hash_table*);
 void libera_hash(hash_table*);
@@ -66,6 +71,13 @@ int main(){
                 remover_parenteses(input);
                 trim_spaces(input);
 
+                //printf("%s\n", input);
+
+                for (int j = 0; j < MAX_LINE_LENGHT; j++)
+                {
+                    argumentos[j] = NULL;
+                }
+
                 char *token = strtok(input, " ");
                 while (token != NULL)
                 {  
@@ -73,9 +85,27 @@ int main(){
                     i++;
                     token = strtok(NULL, " ");
                 }
-                argumentos[i] = NULL;
+                i = 0;
 
-                
+                if (strcmp(argumentos[0],"AND") == 0 || strcmp(argumentos[0],"OR") == 0 || strcmp(argumentos[0],"NOT") == 0)
+                {
+                    printf("\nNão é possível começar a pesquisa com algum operador!!\n");
+                    continue;
+                }
+                else{
+                    int k = 0;
+                    while (argumentos != NULL)
+                    {
+                        index = funcao_hash(argumentos[k], &minhaTabela);
+                        no = consulta_ArvAVL(*minhaTabela.vetor[index], argumentos[k]);
+                        if (no != NULL)
+                        {
+                            
+                        }
+                        
+                        k += 2;
+                    }
+                }
 
                 //index = funcao_hash(input, &minhaTabela);
 
@@ -234,7 +264,7 @@ void trim_spaces(char *str) {
     char *end;
 
     // Remover espaços à esquerda
-    while (isspace((unsigned char)*str)) str++;
+    while (*str && isspace((unsigned char)*str)) str++;
 
     // Se a string está vazia
     if (*str == 0)
