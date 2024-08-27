@@ -29,7 +29,8 @@
 
 - `sources/main.c`: Código fonte principal.
 - `sources/ArvoreAVL.c`: Implementação da árvore AVL.
-- `sources/ArvoreAVL_set.c`: Implementação da árvore AVL para uso das estruturas do tipo Set
+- `sources/ArvoreAVL_set.c`: Implementação da árvore AVL para uso das estruturas do tipo Set.
+- `sources/Set.c`: Implementação de Set.
 - `Makefile`: Arquivo de configuração para compilação.
 
 ## Dependências
