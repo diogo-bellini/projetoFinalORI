@@ -201,9 +201,12 @@ Set* buscar_palavra(hash_table t, char* word){
 
     conjunto = criaSet();
     no = consulta_ArvAVL(*(t.vetor[funcao_hash(word, &t)]), word);
-
-    for(int i = 0; i < no->num_rrn; i++)
-        insereSet(conjunto, no->vetor_rrn[i]);
+    
+    if (no != NULL)
+    {
+        for(int i = 0; i < no->num_rrn; i++)
+            insereSet(conjunto, no->vetor_rrn[i]);
+    }
 
     return conjunto;
 }
