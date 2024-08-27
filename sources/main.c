@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "ArvoreAVL.h"
+#include "Set.h"
+
 
 #define SLOTS 10
 #define MAX_LINE_LENGHT 350
@@ -13,29 +15,25 @@ typedef struct
     ArvAVL** vetor;
 }hash_table;
 
-// typedef struct{
-//     int** rrns;
-//     int** tamanhos;
-// };
-
 //Protótipos
 void init_hash(hash_table*);
 void libera_hash(hash_table*);
 int funcao_hash(char*, hash_table*);
 void processa_arquivo(FILE*, hash_table*);
 void insere_tabela(hash_table*, char*, int, int);
-void remover_parenteses(char*);
-void trim_spaces(char *);
+
+Set* buscar_palavra(hash_table, char*);
+char** tokenize(const char*, int*);
+int precedencia(const char*);
+char** infix_para_postfix(char**, int, int*);
+Set* avaliar_postfix(hash_table, char**, int);
+Set* avaliar_expressao(hash_table, const char*);
+void realizaBusca(hash_table, char*);
 
 //Função principal
 int main(){
     hash_table minhaTabela;
     init_hash(&minhaTabela);
-
-    char input[MAX_LINE_LENGHT];
-    int index, i = 0;
-    char* argumentos[MAX_LINE_LENGHT];
-    ArvAVL no;
 
     FILE* f = fopen("teste.txt","r");
     if (!f)
@@ -58,70 +56,14 @@ int main(){
         printf("\nEscolha o que deseja fazer:\n0. Sair\n1. Pesquisar\n");
         scanf("%d", &opcao);
 
+        char stringBusca[100];
+
         switch (opcao)
         {
         case 1:
-            //lógica de pesquisa
-            printf("Escreva sua pesquisa:\n");
-            while (getchar() != '\n'); // Limpar o buffer de entrada
-
-            if (fgets(input, sizeof(input), stdin) != NULL)
-            {
-                input[strcspn(input, "\n")] = '\0';
-                remover_parenteses(input);
-                trim_spaces(input);
-
-                //printf("%s\n", input);
-
-                for (int j = 0; j < MAX_LINE_LENGHT; j++)
-                {
-                    argumentos[j] = NULL;
-                }
-
-                char *token = strtok(input, " ");
-                while (token != NULL)
-                {  
-                    argumentos[i] = token;
-                    i++;
-                    token = strtok(NULL, " ");
-                }
-                i = 0;
-
-                if (strcmp(argumentos[0],"AND") == 0 || strcmp(argumentos[0],"OR") == 0 || strcmp(argumentos[0],"NOT") == 0)
-                {
-                    printf("\nNão é possível começar a pesquisa com algum operador!!\n");
-                    continue;
-                }
-                else{
-                    int k = 0;
-                    while (argumentos != NULL)
-                    {
-                        index = funcao_hash(argumentos[k], &minhaTabela);
-                        no = consulta_ArvAVL(*minhaTabela.vetor[index], argumentos[k]);
-                        if (no != NULL)
-                        {
-                            
-                        }
-                        
-                        k += 2;
-                    }
-                }
-
-                //index = funcao_hash(input, &minhaTabela);
-
-                // no = consulta_ArvAVL(*minhaTabela.vetor[index] , input);
-                // if(no != NULL){
-                //     printf("RRN nó: %d\n", no->vetor_rrn[0]); 
-                // }
-                
-                
-
-            }
-            else
-            {
-                printf("Erro ao ler a entrada, tente novamente!!!\n");
-            }
-
+            printf("\nBuscar: ");
+            scanf("%s ", stringBusca);
+            realizaBusca(minhaTabela, stringBusca);
             break;
         
         case 0:
@@ -141,7 +83,7 @@ int main(){
 }
 
 //Implementação das funções
-void init_hash(hash_table* t) {
+void init_hash(hash_table* t){
     t->m = SLOTS;
     t->vetor = (ArvAVL**)malloc(sizeof(ArvAVL*) * t->m);
     if (t->vetor == NULL) {
@@ -169,7 +111,7 @@ void libera_hash(hash_table* t){
     free(t->vetor);
 }
 
-int funcao_hash(char* word, hash_table* t) {
+int funcao_hash(char* word, hash_table* t){
     unsigned long numero = 0;
     size_t len = strlen(word);
 
@@ -204,8 +146,6 @@ void processa_arquivo(FILE* f, hash_table* t){
         
         linha_inicial = ftell(f) - strlen(linha);
 
-        //printf("Linha inicial: %ld\n", linha_inicial);
-
         char postagem[MAX_LINE_LENGHT -4];
 
         sscanf(linha, "%*d,%*d,%[^\n]", postagem);
@@ -216,8 +156,6 @@ void processa_arquivo(FILE* f, hash_table* t){
         // }
         
         rrn = linha_inicial + (strlen(linha) - strlen(postagem));
-
-        //printf("RRn: %d\n", rrn);
 
         // if (rrn != 0)
         // {
@@ -247,86 +185,139 @@ void processa_arquivo(FILE* f, hash_table* t){
     //printf("Fim do arquivo\n");
 }
 
-void remover_parenteses(char* str) {
-    int i, j = 0;
-    int tamanho = strlen(str);
+Set* buscar_palavra(hash_table t, char* word){
+    Set* conjunto;
+    ArvAVL no;
 
-    for (i = 0; i < tamanho; i++) {
-        if (str[i] != '(' && str[i] != ')') {
-            str[j++] = str[i];  // Copia o caractere se não for '(' ou ')'
+    conjunto = criaSet();
+    no = consulta_ArvAVL(*(t.vetor[funcao_hash(word, &t)]), word);
+
+    for(int i = 0; i < no->num_rrn; i++)
+        insereSet(conjunto, no->vetor_rrn[i]);
+
+    return conjunto;
+}
+
+char** tokenize(const char* expressao, int* count) { //retorna vetor com strings das palavras da busca
+    char** tokens = malloc(100 * sizeof(char*));
+    *count = 0;
+
+    const char* delimitadores = " ()";
+    char* copia = strdup(expressao);
+    char* token = strtok(copia, delimitadores);
+
+    while (token != NULL) {
+        tokens[*count] = strdup(token);
+        (*count)++;
+        token = strtok(NULL, delimitadores);
+    }
+
+    free(copia);
+    return tokens;
+}
+
+// Precedência: NOT > AND > OR
+int precedencia(const char* operador) {
+    if (strcmp(operador, "NOT") == 0) return 3;
+    if (strcmp(operador, "AND") == 0) return 2;
+    if (strcmp(operador, "OR") == 0) return 1;
+    return 0;
+}
+
+char** infix_para_postfix(char** tokens, int count, int* postfix_count) {
+    char** postfix = malloc(count * sizeof(char*));
+    char* pilha[100];
+    int pilha_topo = -1;
+    int j = 0;
+
+    for (int i = 0; i < count; i++) {
+        if (isalpha(tokens[i][0])) {
+            postfix[j++] = tokens[i];
+        } else if (strcmp(tokens[i], "NOT") == 0 || strcmp(tokens[i], "AND") == 0 || strcmp(tokens[i], "OR") == 0) {
+            while (pilha_topo >= 0 && precedencia(pilha[pilha_topo]) >= precedencia(tokens[i])) {
+                postfix[j++] = pilha[pilha_topo--];
+            }
+            pilha[++pilha_topo] = tokens[i];
+        } else if (strcmp(tokens[i], "(") == 0) {
+            pilha[++pilha_topo] = tokens[i];
+        } else if (strcmp(tokens[i], ")") == 0) {
+            while (pilha_topo >= 0 && strcmp(pilha[pilha_topo], "(") != 0) {
+                postfix[j++] = pilha[pilha_topo--];
+            }
+            pilha_topo--; // Remove '(' da pilha
         }
     }
-    str[j] = '\0';  // Termina a string
+
+    while (pilha_topo >= 0) {
+        postfix[j++] = pilha[pilha_topo--];
+    }
+
+    *postfix_count = j;
+    return postfix;
 }
 
-// Função para remover espaços extras de uma string
-void trim_spaces(char *str) {
-    char *end;
+Set* avaliar_postfix(hash_table t, char** postfix, int count) {
+    Set* pilha[100];
+    int pilha_topo = -1;
+    int not_key = 0;
 
-    // Remover espaços à esquerda
-    while (*str && isspace((unsigned char)*str)) str++;
+    for (int i = 0; i < count; i++) {
+        if (strcmp(postfix[i], "NOT") == 0) {
+            not_key = 1;
+        } else if (strcmp(postfix[i], "AND") == 0) {
+            Set* set1 = pilha[pilha_topo--];
+            Set* set2 = pilha[pilha_topo--];
 
-    // Se a string está vazia
-    if (*str == 0)
-        return;
+            if(not_key){
+                pilha[++pilha_topo] = interseccaoSetNotS1(set1, set2);
+            } else {
+                pilha[++pilha_topo] = interseccaoSet(set1, set2);
+            }
+            not_key = 0;
+        } else if (strcmp(postfix[i], "OR") == 0) {
+            Set* set1 = pilha[pilha_topo--];
+            Set* set2 = pilha[pilha_topo--];
 
-    // Remover espaços à direita
-    end = str + strlen(str) - 1;
-    while (end > str && isspace((unsigned char)*end)) end--;
+            if(not_key){
+                pilha[++pilha_topo] = uniaoSetNotS1(set1, set2);
+            } else {
+                pilha[++pilha_topo] = uniaoSet(set1, set2);
+            }
+            not_key = 0;
+        } else {
+            pilha[++pilha_topo] = buscar_palavra(t, postfix[i]);
+        } 
+    }
 
-    // Null-terminate a string
-    *(end + 1) = 0;
+    return pilha[pilha_topo];
 }
 
-// typedef struct {
-//     int vetor_rrn[MAX_VETOR];
-//     int tamanho;
-// } ResultadoBusca;
+Set* avaliar_expressao(hash_table t, const char* expressao) {
+    int token_count;
+    char** tokens = tokenize(expressao, &token_count);
 
-// ResultadoBusca realizar_operacao(ResultadoBusca r1, ResultadoBusca r2, char operador) {
-//     ResultadoBusca resultado;
-//     int i, j;
-//     resultado.tamanho = 0;
+    int postfix_count;
+    char** postfix = infix_para_postfix(tokens, token_count, &postfix_count);
 
-//     if (operador == 'A') { // AND
-//         for (i = 0; i < r1.tamanho; i++) {
-//             for (j = 0; j < r2.tamanho; j++) {
-//                 if (r1.vetor_rrn[i] == r2.vetor_rrn[j]) {
-//                     resultado.vetor_rrn[resultado.tamanho++] = r1.vetor_rrn[i];
-//                     break;
-//                 }
-//             }
-//         }
-//     } else if (operador == 'O') { // OR
-//         for (i = 0; i < r1.tamanho; i++) {
-//             resultado.vetor_rrn[resultado.tamanho++] = r1.vetor_rrn[i];
-//         }
-//         for (i = 0; i < r2.tamanho; i++) {
-//             int existe = 0;
-//             for (j = 0; j < r1.tamanho; j++) {
-//                 if (r2.vetor_rrn[i] == r1.vetor_rrn[j]) {
-//                     existe = 1;
-//                     break;
-//                 }
-//             }
-//             if (!existe) {
-//                 resultado.vetor_rrn[resultado.tamanho++] = r2.vetor_rrn[i];
-//             }
-//         }
-//     } else if (operador == 'N') { // NOT
-//         for (i = 0; i < r1.tamanho; i++) {
-//             int existe = 0;
-//             for (j = 0; j < r2.tamanho; j++) {
-//                 if (r1.vetor_rrn[i] == r2.vetor_rrn[j]) {
-//                     existe = 1;
-//                     break;
-//                 }
-//             }
-//             if (!existe) {
-//                 resultado.vetor_rrn[resultado.tamanho++] = r1.vetor_rrn[i];
-//             }
-//         }
-//     }
+    Set* resultado = avaliar_postfix(t, postfix, postfix_count);
 
-//     return resultado;
-// }
+    // Liberar memória
+    for (int i = 0; i < token_count; i++) {
+        free(tokens[i]);
+    }
+    free(tokens);
+
+    return resultado;
+}
+
+void realizaBusca(hash_table t, char* expressao){
+    Set* conjunto = criaSet();
+    int rrn;
+
+    conjunto = avaliar_expressao(t, expressao);
+
+    for(beginSet(conjunto); !endSet(conjunto); nextSet(conjunto)){
+        getItemSet(conjunto, &rrn);
+        //buscar na hash pela postagem com esse rrn e printar
+    }
+}

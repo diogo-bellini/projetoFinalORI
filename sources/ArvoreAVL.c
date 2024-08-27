@@ -57,7 +57,6 @@ ArvAVL consulta_ArvAVL(ArvAVL raiz, char* valor) {
     while (atual != NULL) {
         int cmp = strcmp(valor, atual->word);
         if (cmp == 0) {
-            //printf("Palavra: %s, RRN 2: %d\n", atual->word, atual->vetor_rrn[2]);
             return atual; // Palavra encontrada
         }
         if (cmp > 0) {
@@ -121,6 +120,7 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn, int tamanho){
         }
 
         strcpy(novo->word, valor);
+        // printf("Inserido: %s\n", novo->word);
         novo->altura = 0;
         novo->esq = NULL;
         novo->dir = NULL;
@@ -133,8 +133,6 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn, int tamanho){
             free(novo);
             return 0;
         }
-        novo->vetor_rrn[0] = rrn;
-        //printf("Inserido: %s com RRN: %d\n", novo->word, novo->vetor_rrn[0]);
         novo->tamanho_postagem  = (int*)malloc(sizeof(int) * novo->capacidade_rrn);
         if (novo->tamanho_postagem == NULL) {
             free(novo->word);
@@ -142,6 +140,7 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn, int tamanho){
             free(novo);
             return 0;
         }
+        novo->vetor_rrn[0] = rrn;
         novo->tamanho_postagem[0] = tamanho;
 
         *raiz = novo;
@@ -187,7 +186,7 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn, int tamanho){
             }
             atual->vetor_rrn[atual->num_rrn] = rrn;
             atual->tamanho_postagem[atual->num_rrn] = tamanho;
-            //printf("Outra vez %s com RRN %d\n", atual->word, atual->vetor_rrn[atual->num_rrn]);
+            // printf("Novo RRN\n");
             atual->num_rrn++;
 
             return 1;
