@@ -9,7 +9,6 @@ ArvAVL* cria_ArvAVL() {
         *raiz = NULL;
     }
 
-    //printf("Arvore alocada\n");
     return raiz;
 }
 
@@ -109,9 +108,6 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn, int tamanho){
         if(novo == NULL){
             return 0;
         }
-        // else{
-        //     printf("Novo nó alocado\n");
-        // }
 
         novo->word = (char*) malloc(strlen(valor) + 1); // Aloca memória para a word
         if (novo->word == NULL) {
@@ -120,7 +116,6 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn, int tamanho){
         }
 
         strcpy(novo->word, valor);
-        // printf("Inserido: %s\n", novo->word);
         novo->altura = 0;
         novo->esq = NULL;
         novo->dir = NULL;
@@ -172,9 +167,9 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn, int tamanho){
                 }
             }
         }else{ //Word já existe
-            if (atual->num_rrn == atual->capacidade_rrn)
+            if (atual->num_rrn == atual->capacidade_rrn) // Se vetor de RRN já estiver cheio
             {
-                atual->capacidade_rrn *= 2;
+                atual->capacidade_rrn *= 2; // Dobra a capacidade
                 atual->vetor_rrn = (int*)realloc(atual->vetor_rrn, sizeof(int) * atual->capacidade_rrn);
                 if (atual->vetor_rrn == NULL){
                     return 0;
@@ -186,7 +181,6 @@ int insere_ArvAVL(ArvAVL *raiz, char* valor, int rrn, int tamanho){
             }
             atual->vetor_rrn[atual->num_rrn] = rrn;
             atual->tamanho_postagem[atual->num_rrn] = tamanho;
-            // printf("Novo RRN\n");
             atual->num_rrn++;
 
             return 1;
