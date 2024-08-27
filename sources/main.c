@@ -1,3 +1,10 @@
+/*
+    Diogo Conforti Vaz Bellini 823829
+    João Paulo Morais Rangel 820827
+    Enzo Yasumasa Hirotani
+*/
+
+// Bibliotecas
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -5,7 +12,7 @@
 #include "ArvoreAVL.h"
 #include "Set.h"
 
-
+// Definições
 #define SLOTS 10
 #define MAX_LINE_LENGHT 350
 #define TAM_STRING_BUSCA 300
@@ -17,11 +24,11 @@ typedef struct
 }hash_table;
 
 //Protótipos
-void init_hash(hash_table*);
-void libera_hash(hash_table*);
-int funcao_hash(char*, hash_table*);
-void processa_arquivo(FILE*, hash_table*);
-void insere_tabela(hash_table*, char*, int, int);
+void init_hash(hash_table*); // Função para iniciar tabela hash
+void libera_hash(hash_table*); // Função para desalocar tabela hash
+int funcao_hash(char*, hash_table*); // Função que retorna o index da palavra na hash
+void processa_arquivo(FILE*, hash_table*); // Função de processamento das postagens na hash
+void insere_tabela(hash_table*, char*, int, int); // Função de inserção na hash
 
 Set* buscar_palavra(hash_table, char*);
 char** tokenize(const char*, int*);
@@ -36,23 +43,19 @@ int main(){
     hash_table minhaTabela;
     init_hash(&minhaTabela);
 
-    FILE* f = fopen("teste.txt","r");
+    FILE* f = fopen("teste.txt","r"); // Abertura do arquivo
     if (!f)
     {
         printf("Erro ao abrir o arquivo!!");
         libera_hash(&minhaTabela);
         return -1;
     }
-    // else
-    // {
-    //     printf("Arquivo aberto com sucesso\n");
-    // }
 
-    processa_arquivo(f, &minhaTabela);
+    processa_arquivo(f, &minhaTabela); // Preenchimento da hash
 
     int opcao = -1;
 
-    while (opcao != 0)
+    while (opcao != 0) // Menu do usuário
     {
         printf("\nEscolha o que deseja fazer:\n0. Sair\n1. Pesquisar\n");
         scanf("%d", &opcao);
@@ -64,7 +67,6 @@ int main(){
         case 1:
             printf("\nBuscar: ");
             while ( getchar() != '\n' ); //Limpar o buffer
-            //scanf("%s ", stringBusca);
             if (fgets(stringBusca, TAM_STRING_BUSCA, stdin) != NULL)
             {
                 stringBusca[strcspn(stringBusca, "\n")] = '\0';
@@ -85,9 +87,9 @@ int main(){
         }
     }
     
-    fclose(f);
+    fclose(f); // Fechamento do arquivo
 
-    libera_hash(&minhaTabela);
+    libera_hash(&minhaTabela); // Liberação da memória
 
     return 0;
 }
@@ -99,13 +101,10 @@ void init_hash(hash_table* t){
     if (t->vetor == NULL) {
         exit(1);
     }
-    // else{
-    //     printf("Tabela hash inicializada com %d slots\n", t->m);
-    // }
 
-    // Inicialize cada ponteiro no array
+    // Inicializa cada ponteiro no array
     for (int i = 0; i < t->m; i++) {
-        t->vetor[i] = cria_ArvAVL(); // `cria_ArvAVL` retorna um ponteiro para `ArvAVL
+        t->vetor[i] = cria_ArvAVL(); // cria_ArvAVL retorna um ponteiro para ArvAVL
         if (t->vetor[i] == NULL) {
             printf("Erro ao criar a árvore AVL no slot %d\n", i);
             exit(1);
@@ -148,51 +147,43 @@ void processa_arquivo(FILE* f, hash_table* t){
 
     long int linha_inicial;
     int rrn = 0;
+    int tamanho_postagem = 0;
 
-    while (fgets(linha, sizeof(linha), f))
+    while (fgets(linha, sizeof(linha), f)) // Processa linha por linha
     {
-        //printf("Linha lida\n");
-        linha[strcspn(linha, "\n")] = '\0';
+        linha[strcspn(linha, "\n")] = '\0'; // Remove o "\n"
         
-        linha_inicial = ftell(f) - strlen(linha);
+        linha_inicial = ftell(f) - strlen(linha); // Posição começo da linha
 
         char postagem[MAX_LINE_LENGHT -4];
 
         sscanf(linha, "%*d,%*d,%[^\n]", postagem);
-
-        // if (strcmp(postagem, ""))
-        // {
-        //     printf("Postagem check\n");
-        // }
         
-        rrn = linha_inicial + (strlen(linha) - strlen(postagem));
-
-        // if (rrn != 0)
-        // {
-        //     printf("RRN check\n");
-        // }
+        tamanho_postagem = strlen(postagem); // Definição do tamanho da postagem
+        rrn = linha_inicial + (strlen(linha) - tamanho_postagem); // Definição do RRN da postagem
         
-        char* token = strtok(postagem, " ,.!?");
+        // Separando por palavra
+        char* token = strtok(postagem, " ,.!?:");
         while (token != NULL)
         {
+            // Remove espaços
             while (*token && isspace(*token)) token++;
             if (*token == '\0') { // Se a string estiver vazia após remover espaços
-                token = strtok(NULL, " ,.!?");
+                token = strtok(NULL, " ,.!?:");
                 continue;
             }
             char* end = token + strlen(token) - 1;
             while (end > token && isspace(*end)) end--;
             *(end + 1) = '\0';
 
+            // Insere palavra na tabela
             if (strlen(token) > 0)
             {
-                insere_tabela(t, token, rrn, strlen(postagem));
-                //printf("Inserido: %s\n", token);
+                insere_tabela(t, token, rrn, tamanho_postagem);
             }
-            token = strtok(NULL, " ,.!?");
+            token = strtok(NULL, " ,.!?:");
         }
     }
-    //printf("Fim do arquivo\n");
 }
 
 Set* buscar_palavra(hash_table t, char* word){

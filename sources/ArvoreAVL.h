@@ -1,8 +1,8 @@
 struct NO{
-    char* word;
-    int num_rrn;
-    int* vetor_rrn;
-    int capacidade_rrn;
+    char* word; // Palavra armazenada
+    int num_rrn; // Quantidade de RRNs
+    int* vetor_rrn; 
+    int capacidade_rrn; // Tamanho do vetor de RRNs
     int* tamanho_postagem;
 
     int altura;
