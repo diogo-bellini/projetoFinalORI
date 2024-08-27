@@ -8,6 +8,7 @@
 
 #define SLOTS 10
 #define MAX_LINE_LENGHT 350
+#define TAM_STRING_BUSCA 300
 
 typedef struct
 {
@@ -56,14 +57,23 @@ int main(){
         printf("\nEscolha o que deseja fazer:\n0. Sair\n1. Pesquisar\n");
         scanf("%d", &opcao);
 
-        char stringBusca[100];
+        char stringBusca[TAM_STRING_BUSCA];
 
         switch (opcao)
         {
         case 1:
             printf("\nBuscar: ");
-            scanf("%s ", stringBusca);
-            realizaBusca(minhaTabela, stringBusca);
+            while ( getchar() != '\n' ); //Limpar o buffer
+            //scanf("%s ", stringBusca);
+            if (fgets(stringBusca, TAM_STRING_BUSCA, stdin) != NULL)
+            {
+                stringBusca[strcspn(stringBusca, "\n")] = '\0';
+                realizaBusca(minhaTabela, stringBusca);
+            }
+            else{
+                printf("Falha na busca!!!\n");
+            }
+
             break;
         
         case 0:
