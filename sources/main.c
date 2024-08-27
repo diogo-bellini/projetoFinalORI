@@ -49,6 +49,7 @@ int main(){
 
     processa_arquivo(f, &minhaTabela);
 
+
     int opcao = -1;
 
     while (opcao != 0)
@@ -316,8 +317,15 @@ void realizaBusca(hash_table t, char* expressao){
 
     conjunto = avaliar_expressao(t, expressao);
 
-    for(beginSet(conjunto); !endSet(conjunto); nextSet(conjunto)){
-        getItemSet(conjunto, &rrn);
-        //buscar na hash pela postagem com esse rrn e printar
+    printf("Chegou aq");
+
+    if(conjunto != NULL){
+        for(beginSet(conjunto); !endSet(conjunto); nextSet(conjunto)){
+            getItemSet(conjunto, &rrn);
+            //buscar na hash pela postagem com esse rrn e printar
+            printf("%d",rrn);
+        }
     }
+
+
 }
