@@ -164,13 +164,13 @@ void processa_arquivo(FILE* f, hash_table* t){
         rrn = linha_inicial + (strlen(linha) - tamanho_postagem); // Definição do RRN da postagem
         
         // Separando por palavra
-        char* token = strtok(postagem, " ,.!?:");
+        char* token = strtok(postagem, " ,.!?");
         while (token != NULL)
         {
             // Remove espaços
             while (*token && isspace(*token)) token++;
             if (*token == '\0') { // Se a string estiver vazia após remover espaços
-                token = strtok(NULL, " ,.!?:");
+                token = strtok(NULL, " ,.!?");
                 continue;
             }
             char* end = token + strlen(token) - 1;
@@ -182,7 +182,7 @@ void processa_arquivo(FILE* f, hash_table* t){
             {
                 insere_tabela(t, token, rrn, tamanho_postagem);
             }
-            token = strtok(NULL, " ,.!?:");
+            token = strtok(NULL, " ,.!?");
         }
     }
 }
