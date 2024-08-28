@@ -233,6 +233,10 @@ int precedencia(const char* operador) {
     return 0;
 }
 
+int is_operator(const char* token) {
+    return strcmp(token, "NOT") == 0 || strcmp(token, "AND") == 0 || strcmp(token, "OR") == 0;
+}
+
 // ARRUMAR !!!! 
 char** infix_para_postfix(char** tokens, int count, int* postfix_count) {
     char** postfix = malloc(count * sizeof(char*));
@@ -241,15 +245,15 @@ char** infix_para_postfix(char** tokens, int count, int* postfix_count) {
     int j = 0;
 
     for (int i = 0; i < count; i++) {
-        if (isalpha(tokens[i][0])) {
-            postfix[j++] = tokens[i];
-        } else if (strcmp(tokens[i], "NOT") == 0 || strcmp(tokens[i], "AND") == 0 || strcmp(tokens[i], "OR") == 0) {
+        if (!is_operator(tokens[i]) && strcmp(tokens[i], "(") != 0 && strcmp(tokens[i], ")") != 0) {
+            postfix[j++] = tokens[i];  // É um operando
+        } else if (is_operator(tokens[i])) {
             while (pilha_topo >= 0 && precedencia(pilha[pilha_topo]) >= precedencia(tokens[i])) {
                 postfix[j++] = pilha[pilha_topo--];
             }
-            pilha[++pilha_topo] = tokens[i];
+            pilha[++pilha_topo] = tokens[i];  // Empilha o operador
         } else if (strcmp(tokens[i], "(") == 0) {
-            pilha[++pilha_topo] = tokens[i];
+            pilha[++pilha_topo] = tokens[i];  // Empilha o '('
         } else if (strcmp(tokens[i], ")") == 0) {
             while (pilha_topo >= 0 && strcmp(pilha[pilha_topo], "(") != 0) {
                 postfix[j++] = pilha[pilha_topo--];
@@ -276,6 +280,10 @@ Set* avaliar_postfix(hash_table* t, char** postfix, int count) {
         if (strcmp(postfix[i], "NOT") == 0) {
             not_key = 1;
         } else if (strcmp(postfix[i], "AND") == 0) {
+            if (pilha_topo < 1) {
+                printf("Erro: Expressão inválida para operação AND.\n");
+                return NULL;
+            }
             Set* set1 = pilha[pilha_topo];
             pilha_topo--; //VERIFICAR
             Set* set2 = pilha[pilha_topo];
@@ -288,6 +296,10 @@ Set* avaliar_postfix(hash_table* t, char** postfix, int count) {
             }
             not_key = 0;
         } else if (strcmp(postfix[i], "OR") == 0) {
+            if (pilha_topo < 1) {
+                printf("Erro: Expressão inválida para operação OR.\n");
+                return NULL;
+            }
             Set* set1 = pilha[pilha_topo];
             pilha_topo--;
             Set* set2 = pilha[pilha_topo];
@@ -306,6 +318,11 @@ Set* avaliar_postfix(hash_table* t, char** postfix, int count) {
                 pilha[++pilha_topo] = conjunto;
             }
         } 
+    }
+
+    if (pilha_topo != 0) {
+        printf("Erro: Expressão mal formada.\n");
+        return NULL;
     }
 
     return pilha[pilha_topo];
