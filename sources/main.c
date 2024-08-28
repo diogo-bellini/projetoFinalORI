@@ -235,7 +235,7 @@ char** infix_para_postfix(char** tokens, int count, int* postfix_count) {
     int j = 0;
 
     for (int i = 0; i < count; i++) {
-        if (isalpha(tokens[i][0]) || isdigit(tokens[i][0])) {
+        if (isalpha(tokens[i][0])) {
             postfix[j++] = tokens[i];
         } else if (strcmp(tokens[i], "NOT") == 0 || strcmp(tokens[i], "AND") == 0 || strcmp(tokens[i], "OR") == 0) {
             while (pilha_topo >= 0 && precedencia(pilha[pilha_topo]) >= precedencia(tokens[i])) {
@@ -257,6 +257,7 @@ char** infix_para_postfix(char** tokens, int count, int* postfix_count) {
     }
 
     *postfix_count = j;
+
     return postfix;
 }
 
@@ -323,7 +324,9 @@ void realizaBusca(hash_table t, char* expressao, FILE* f){
     for(beginSet(conjunto); !endSet(conjunto); nextSet(conjunto)){
         getItemSet(conjunto, &rrn);
         //buscar na hash pela postagem com esse rrn e printar
-        printf("%d\n", rrn);
-        
+        char saida[MAX_LINE_LENGHT];
+        fseek(f, rrn, SEEK_SET);
+        fgets(saida, MAX_LINE_LENGHT * sizeof(char), f);
+        printf("rrn:  %d frase:%s\n",rrn, saida);
     }
 }
