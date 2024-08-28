@@ -44,7 +44,7 @@ int main(){
     hash_table minhaTabela;
     init_hash(&minhaTabela);
 
-    FILE* f = fopen("teste.txt","r"); // Abertura do arquivo
+    FILE* f = fopen("corpus.csv","r"); // Abertura do arquivo
     if (!f)
     {
         printf("Erro ao abrir o arquivo!!");
@@ -307,7 +307,8 @@ Set* avaliar_postfix(hash_table* t, char** postfix, int count) {
             pilha_topo--;
 
             if(not_key){
-                pilha[++pilha_topo] = uniaoSetNotS1(set1, set2);
+                printf("Erro: Expressão mal formada.\n");
+                return NULL;
             } else {
                 pilha[++pilha_topo] = uniaoSet(set1, set2);
             }
