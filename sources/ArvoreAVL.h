@@ -3,7 +3,6 @@ struct NO{
     int num_rrn; // Quantidade de RRNs
     int* vetor_rrn; 
     int capacidade_rrn; // Tamanho do vetor de RRNs
-    int* tamanho_postagem;
 
     int altura;
     struct NO *esq;
@@ -14,5 +13,5 @@ typedef struct NO* ArvAVL;
 
 ArvAVL* cria_ArvAVL();
 void libera_ArvAVL(ArvAVL *raiz);
-int insere_ArvAVL(ArvAVL *raiz, char* data, int rrn, int tamanho);
+int insere_ArvAVL(ArvAVL *raiz, char* data, int rrn);
 ArvAVL consulta_ArvAVL(ArvAVL raiz, char* valor);

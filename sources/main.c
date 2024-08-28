@@ -28,7 +28,7 @@ void init_hash(hash_table*); // Função para iniciar tabela hash
 void libera_hash(hash_table*); // Função para desalocar tabela hash
 int funcao_hash(char*, hash_table*); // Função que retorna o index da palavra na hash
 void processa_arquivo(FILE*, hash_table*); // Função de processamento das postagens na hash
-void insere_tabela(hash_table*, char*, int, int); // Função de inserção na hash
+void insere_tabela(hash_table*, char*, int); // Função de inserção na hash
 
 Set* buscar_palavra(hash_table*, char*);
 char** tokenize(const char*, int*);
@@ -44,7 +44,7 @@ int main(){
     hash_table minhaTabela;
     init_hash(&minhaTabela);
 
-    FILE* f = fopen("corpus.csv","r"); // Abertura do arquivo
+    FILE* f = fopen("teste.txt","r"); // Abertura do arquivo
     if (!f)
     {
         printf("Erro ao abrir o arquivo!!");
@@ -134,13 +134,13 @@ int funcao_hash(char* word, hash_table* t){
     return numero % t->m;
 }
 
-void insere_tabela(hash_table* t, char* word, int rrn, int tamanho){
+void insere_tabela(hash_table* t, char* word, int rrn){
     int index = funcao_hash(word, t);
     if (index < 0 || index >= t->m) {
         printf("Índice inválido na tabela hash: %d\n", index);
         return;
     }
-    insere_ArvAVL(t->vetor[index], word, rrn, tamanho);
+    insere_ArvAVL(t->vetor[index], word, rrn);
 }
 
 void processa_arquivo(FILE* f, hash_table* t){
@@ -180,7 +180,7 @@ void processa_arquivo(FILE* f, hash_table* t){
             // Insere palavra na tabela
             if (strlen(token) > 0)
             {
-                insere_tabela(t, token, rrn, tamanho_postagem);
+                insere_tabela(t, token, rrn);
             }
             token = strtok(NULL, " ,.!?");
         }
