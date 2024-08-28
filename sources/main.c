@@ -30,13 +30,13 @@ int funcao_hash(char*, hash_table*); // Função que retorna o index da palavra 
 void processa_arquivo(FILE*, hash_table*); // Função de processamento das postagens na hash
 void insere_tabela(hash_table*, char*, int, int); // Função de inserção na hash
 
-Set* buscar_palavra(hash_table, char*);
+Set* buscar_palavra(hash_table*, char*);
 char** tokenize(const char*, int*);
 int precedencia(const char*);
 char** infix_para_postfix(char**, int, int*);
-Set* avaliar_postfix(hash_table, char**, int);
-Set* avaliar_expressao(hash_table, const char*);
-void realizaBusca(hash_table, char*,FILE*);
+Set* avaliar_postfix(hash_table*, char**, int);
+Set* avaliar_expressao(hash_table*, const char*);
+void realizaBusca(hash_table*, char*,FILE*);
 
 //Função principal
 int main(){
@@ -53,24 +53,24 @@ int main(){
 
     processa_arquivo(f, &minhaTabela); // Preenchimento da hash
 
-    int opcao = -1;
+    char opcao = -1;
 
-    while (opcao != 0) // Menu do usuário
+    while (opcao != '0') // Menu do usuário
     {
         printf("\nEscolha o que deseja fazer:\n0. Sair\n1. Pesquisar\n");
-        scanf("%d", &opcao);
+        scanf("%c", &opcao);
 
         char stringBusca[TAM_STRING_BUSCA];
 
         switch (opcao)
         {
-        case 1:
+        case '1':
             printf("\nBuscar: ");
             while ( getchar() != '\n' ); //Limpar o buffer
             if (fgets(stringBusca, TAM_STRING_BUSCA, stdin) != NULL)
             {
                 stringBusca[strcspn(stringBusca, "\n")] = '\0';
-                realizaBusca(minhaTabela, stringBusca, f);
+                realizaBusca(&minhaTabela, stringBusca, f);
             }
             else{
                 printf("Falha na busca!!!\n");
@@ -78,7 +78,7 @@ int main(){
 
             break;
         
-        case 0:
+        case '0':
             printf("\nSaindo...\n");
             break;
         default:
@@ -153,7 +153,7 @@ void processa_arquivo(FILE* f, hash_table* t){
     {
         linha[strcspn(linha, "\n")] = '\0'; // Remove o "\n"
         
-        linha_inicial = ftell(f) - strlen(linha); // Posição começo da linha
+        linha_inicial = ftell(f) - strlen(linha) - 1; // Posição começo da linha
 
         char postagem[MAX_LINE_LENGHT -4];
 
@@ -186,12 +186,17 @@ void processa_arquivo(FILE* f, hash_table* t){
     }
 }
 
-Set* buscar_palavra(hash_table t, char* word){
+Set* buscar_palavra(hash_table* t, char* word){
     Set* conjunto;
     ArvAVL no;
 
     conjunto = criaSet();
-    no = consulta_ArvAVL(*(t.vetor[funcao_hash(word, &t)]), word);
+    int indice = funcao_hash(word, t);
+    if (&(t->vetor[indice]) == NULL) {
+        printf("Erro: Ponteiro nulo em t->vetor[%d] para a palavra '%s'\n", indice, word);
+        return NULL;  // ou o valor apropriado para indicar um erro
+    }
+    no = consulta_ArvAVL(*(t->vetor[indice]), word);
     
     if (no != NULL)
     {
@@ -228,6 +233,7 @@ int precedencia(const char* operador) {
     return 0;
 }
 
+// ARRUMAR !!!! 
 char** infix_para_postfix(char** tokens, int count, int* postfix_count) {
     char** postfix = malloc(count * sizeof(char*));
     char* pilha[100];
@@ -261,7 +267,7 @@ char** infix_para_postfix(char** tokens, int count, int* postfix_count) {
     return postfix;
 }
 
-Set* avaliar_postfix(hash_table t, char** postfix, int count) {
+Set* avaliar_postfix(hash_table* t, char** postfix, int count) {
     Set* pilha[100];
     int pilha_topo = -1;
     int not_key = 0;
@@ -270,8 +276,10 @@ Set* avaliar_postfix(hash_table t, char** postfix, int count) {
         if (strcmp(postfix[i], "NOT") == 0) {
             not_key = 1;
         } else if (strcmp(postfix[i], "AND") == 0) {
-            Set* set1 = pilha[pilha_topo--];
-            Set* set2 = pilha[pilha_topo--];
+            Set* set1 = pilha[pilha_topo];
+            pilha_topo--; //VERIFICAR
+            Set* set2 = pilha[pilha_topo];
+            pilha_topo--;
 
             if(not_key){
                 pilha[++pilha_topo] = interseccaoSetNotS1(set1, set2);
@@ -280,8 +288,10 @@ Set* avaliar_postfix(hash_table t, char** postfix, int count) {
             }
             not_key = 0;
         } else if (strcmp(postfix[i], "OR") == 0) {
-            Set* set1 = pilha[pilha_topo--];
-            Set* set2 = pilha[pilha_topo--];
+            Set* set1 = pilha[pilha_topo];
+            pilha_topo--;
+            Set* set2 = pilha[pilha_topo];
+            pilha_topo--;
 
             if(not_key){
                 pilha[++pilha_topo] = uniaoSetNotS1(set1, set2);
@@ -290,14 +300,18 @@ Set* avaliar_postfix(hash_table t, char** postfix, int count) {
             }
             not_key = 0;
         } else {
-            pilha[++pilha_topo] = buscar_palavra(t, postfix[i]);
+            Set* conjunto = buscar_palavra(t, postfix[i]);
+            if (conjunto != NULL)
+            {
+                pilha[++pilha_topo] = conjunto;
+            }
         } 
     }
 
     return pilha[pilha_topo];
 }
 
-Set* avaliar_expressao(hash_table t, const char* expressao) {
+Set* avaliar_expressao(hash_table* t, const char* expressao) {
     int token_count;
     char** tokens = tokenize(expressao, &token_count);
 
@@ -315,7 +329,7 @@ Set* avaliar_expressao(hash_table t, const char* expressao) {
     return resultado;
 }
 
-void realizaBusca(hash_table t, char* expressao, FILE* f){
+void realizaBusca(hash_table* t, char* expressao, FILE* f){
     Set* conjunto = criaSet();
     int rrn;
 
@@ -327,6 +341,6 @@ void realizaBusca(hash_table t, char* expressao, FILE* f){
         char saida[MAX_LINE_LENGHT];
         fseek(f, rrn, SEEK_SET);
         fgets(saida, MAX_LINE_LENGHT * sizeof(char), f);
-        printf("rrn:  %d frase:%s\n",rrn, saida);
+        printf("%s\n",saida);
     }
 }

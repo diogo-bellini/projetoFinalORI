@@ -116,6 +116,7 @@ void posOrdem_ArvAVL_set(ArvAVL *raiz){
 
 int consulta_ArvAVL_set(ArvAVL *raiz, int valor){
     if(raiz == NULL)
+        printf("Raiz é NULL\n");
         return 0;
     struct NO* atual = *raiz;
     while(atual != NULL){
