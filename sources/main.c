@@ -33,6 +33,7 @@ void insere_tabela(hash_table*, char*, int, int); // Função de inserção na h
 Set* buscar_palavra(hash_table*, char*);
 char** tokenize(const char*, int*);
 int precedencia(const char*);
+int is_operator(const char* );
 char** infix_para_postfix(char**, int, int*);
 Set* avaliar_postfix(hash_table*, char**, int);
 Set* avaliar_expressao(hash_table*, const char*);
