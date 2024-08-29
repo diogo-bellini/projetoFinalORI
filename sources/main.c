@@ -30,14 +30,14 @@ int funcao_hash(char*, hash_table*); // Função que retorna o index da palavra 
 void processa_arquivo(FILE*, hash_table*); // Função de processamento das postagens na hash
 void insere_tabela(hash_table*, char*, int); // Função de inserção na hash
 
-Set* buscar_palavra(hash_table*, char*);
-char** tokenize(const char*, int*);
-int precedencia(const char*);
-int is_operator(const char* );
-char** infix_para_postfix(char**, int, int*);
-Set* avaliar_postfix(hash_table*, char**, int);
-Set* avaliar_expressao(hash_table*, const char*);
-void realizaBusca(hash_table*, char*,FILE*);
+Set* buscar_palavra(hash_table*, char*); // Retorna o conjunto de postagens com a palavra especificada
+char** tokenize(const char*, int*); // Separa a string de busca em sub-strings
+int precedencia(const char*); // Função auxiliar que define a prioridade de operações
+int is_operator(const char* ); // Função auxiliar que verifica se a string trata-se de um operador
+char** infix_para_postfix(char**, int, int*); // Ordena o conjunto de sub-strings da string de busca para Ordenação Pós-Fixa
+Set* avaliar_postfix(hash_table*, char**, int); // Realiza as operações e retorna um conjunto de postagens(seus rrns)
+Set* avaliar_expressao(hash_table*, const char*); // Gerencia o tratamento da string de busca, desde sua entrada até o retorno do conjunto especificado
+void realizaBusca(hash_table*, char*,FILE*); // Procura pelas postagens na tabela hash e printa-as
 
 //Função principal
 int main(){
@@ -58,7 +58,7 @@ int main(){
 
     while (opcao != '0') // Menu do usuário
     {
-        printf("\nEscolha o que deseja fazer:\n0. Sair\n1. Pesquisar\n");
+        printf("\nEscolha o que deseja fazer:\n0. Sair\n1. Pesquisar\n>> ");
         scanf("%c", &opcao);
 
         char stringBusca[TAM_STRING_BUSCA];
@@ -70,15 +70,15 @@ int main(){
             while ( getchar() != '\n' ); //Limpar o buffer
             if (fgets(stringBusca, TAM_STRING_BUSCA, stdin) != NULL)
             {
+                printf("\n");
                 stringBusca[strcspn(stringBusca, "\n")] = '\0';
                 realizaBusca(&minhaTabela, stringBusca, f);
             }
             else{
-                printf("Falha na busca!!!\n");
+                printf("\nFalha na busca!!!\n");
             }
 
             break;
-        
         case '0':
             printf("\nSaindo...\n");
             break;
@@ -191,26 +191,30 @@ Set* buscar_palavra(hash_table* t, char* word){
     Set* conjunto;
     ArvAVL no;
 
-    conjunto = criaSet();
-    int indice = funcao_hash(word, t);
+    conjunto = criaSet(); // Criação de um novo conjunto vazio
+    int indice = funcao_hash(word, t); // Cálculo do índice da tabela hash
+    // Verificação se o ponteiro para a lista ligada no índice calculado é nulo
     if (&(t->vetor[indice]) == NULL) {
         printf("Erro: Ponteiro nulo em t->vetor[%d] para a palavra '%s'\n", indice, word);
         return NULL;  // ou o valor apropriado para indicar um erro
     }
+    // Consulta na árvore AVL para encontrar a palavra
     no = consulta_ArvAVL(*(t->vetor[indice]), word);
     
+    // Se a palavra for encontrada, armazena os RRN no conjunto
     if (no != NULL)
     {
         for(int i = 0; i < no->num_rrn; i++)
             insereSet(conjunto, no->vetor_rrn[i]);
     }
 
-    return conjunto;
+    return conjunto; // Retorna o conjunto com os RRN encontrados ou vazio
 }
 
-char** tokenize(const char* expressao, int* count) { //retorna vetor com strings das palavras da busca
+// Retorna vetor com strings das palavras da busca
+char** tokenize(const char* expressao, int* count) { 
     char** tokens = malloc(100 * sizeof(char*));
-    *count = 0;
+    *count = 0; // Contador para a quantidade de sub-strings da string de busca
 
     const char* delimitadores = " ()";
     char* copia = strdup(expressao);
@@ -238,7 +242,6 @@ int is_operator(const char* token) {
     return strcmp(token, "NOT") == 0 || strcmp(token, "AND") == 0 || strcmp(token, "OR") == 0;
 }
 
-// ARRUMAR !!!! 
 char** infix_para_postfix(char** tokens, int count, int* postfix_count) {
     char** postfix = malloc(count * sizeof(char*));
     char* pilha[100];
@@ -246,9 +249,9 @@ char** infix_para_postfix(char** tokens, int count, int* postfix_count) {
     int j = 0;
 
     for (int i = 0; i < count; i++) {
-        if (!is_operator(tokens[i]) && strcmp(tokens[i], "(") != 0 && strcmp(tokens[i], ")") != 0) {
-            postfix[j++] = tokens[i];  // É um operando
-        } else if (is_operator(tokens[i])) {
+        if (!is_operator(tokens[i]) && strcmp(tokens[i], "(") != 0 && strcmp(tokens[i], ")") != 0) {  // É um operando
+            postfix[j++] = tokens[i]; 
+        } else if (is_operator(tokens[i])) { // É um operador
             while (pilha_topo >= 0 && precedencia(pilha[pilha_topo]) >= precedencia(tokens[i])) {
                 postfix[j++] = pilha[pilha_topo--];
             }
@@ -264,32 +267,34 @@ char** infix_para_postfix(char** tokens, int count, int* postfix_count) {
     }
 
     while (pilha_topo >= 0) {
-        postfix[j++] = pilha[pilha_topo--];
+        postfix[j++] = pilha[pilha_topo--]; // Adiciona os operadores a expressão
     }
 
-    *postfix_count = j;
+    *postfix_count = j; // Quantidade de strings da expressão
 
-    return postfix;
+    return postfix; // Retorna expressão pós-fixa
 }
 
 Set* avaliar_postfix(hash_table* t, char** postfix, int count) {
-    Set* pilha[100];
+    Set* pilha[100]; // Pilha para conjunto das palavras buscadas
     int pilha_topo = -1;
-    int not_key = 0;
+    int not_key = 0; // Booleano para aplicar o NOT na busca
 
     for (int i = 0; i < count; i++) {
         if (strcmp(postfix[i], "NOT") == 0) {
-            not_key = 1;
+            not_key = 1; // Altera para verdadeiro
         } else if (strcmp(postfix[i], "AND") == 0) {
-            if (pilha_topo < 1) {
+            if (pilha_topo < 1) { // Verifica se há pelo menos dois conjuntos na pilha para a operação OR
                 printf("Erro: Expressão inválida para operação AND.\n");
                 return NULL;
             }
+            // Remove os dois conjuntos do topo da pilha
             Set* set1 = pilha[pilha_topo];
-            pilha_topo--; //VERIFICAR
+            pilha_topo--; 
             Set* set2 = pilha[pilha_topo];
             pilha_topo--;
 
+            // Realiza a intersecção
             if(not_key){
                 pilha[++pilha_topo] = interseccaoSetNotS1(set1, set2);
             } else {
@@ -297,23 +302,25 @@ Set* avaliar_postfix(hash_table* t, char** postfix, int count) {
             }
             not_key = 0;
         } else if (strcmp(postfix[i], "OR") == 0) {
-            if (pilha_topo < 1) {
+            if (pilha_topo < 1) { // Verifica se há pelo menos dois conjuntos na pilha para a operação OR
                 printf("Erro: Expressão inválida para operação OR.\n");
                 return NULL;
             }
+            // Remove os dois conjuntos do topo da pilha
             Set* set1 = pilha[pilha_topo];
             pilha_topo--;
             Set* set2 = pilha[pilha_topo];
             pilha_topo--;
 
-            if(not_key){
+            // Realiza a união
+            if(not_key){ // Operador OR não pode ser combinado com NOT neste contexto
                 printf("Erro: Expressão mal formada.\n");
                 return NULL;
-            } else {
+            } else { 
                 pilha[++pilha_topo] = uniaoSet(set1, set2);
             }
             not_key = 0;
-        } else {
+        } else { // Busca a palavra na tabela hash e empilha o conjunto resultante
             Set* conjunto = buscar_palavra(t, postfix[i]);
             if (conjunto != NULL)
             {
@@ -322,42 +329,45 @@ Set* avaliar_postfix(hash_table* t, char** postfix, int count) {
         } 
     }
 
-    if (pilha_topo != 0) {
+    // Verifica se a expressão foi totalmente avaliada com um único conjunto final na pilha
+    if (pilha_topo != 0) { 
         printf("Erro: Expressão mal formada.\n");
         return NULL;
     }
 
-    return pilha[pilha_topo];
+    return pilha[pilha_topo]; // Retorna o conjunto resultante da avaliação
 }
 
 Set* avaliar_expressao(hash_table* t, const char* expressao) {
-    int token_count;
-    char** tokens = tokenize(expressao, &token_count);
+    int token_count; // Número de tokens encontrados na expressão
+    char** tokens = tokenize(expressao, &token_count); // Divide a expressão em tokens e conta quantos foram encontrados
 
-    int postfix_count;
-    char** postfix = infix_para_postfix(tokens, token_count, &postfix_count);
+    int postfix_count; // Armazena o número de tokens na expressão postfix
+    char** postfix = infix_para_postfix(tokens, token_count, &postfix_count); // Converte os tokens da expressão infixa para postfix
 
+    // Avalia a expressão postfix usando a tabela hash e retorna o conjunto resultante
     Set* resultado = avaliar_postfix(t, postfix, postfix_count);
 
-    // Liberar memória
+    // Libera a memória
     for (int i = 0; i < token_count; i++) {
         free(tokens[i]);
     }
     free(tokens);
 
-    return resultado;
+    return resultado; // Retorna conjunto especificado
 }
 
 void realizaBusca(hash_table* t, char* expressao, FILE* f){
     Set* conjunto = criaSet();
     int rrn;
 
-    conjunto = avaliar_expressao(t, expressao);
+    conjunto = avaliar_expressao(t, expressao); // Realiza o tratamento da expressão
 
+    // Busca na hash pela postagem com esse rrn e printa
     for(beginSet(conjunto); !endSet(conjunto); nextSet(conjunto)){
-        getItemSet(conjunto, &rrn);
-        //buscar na hash pela postagem com esse rrn e printar
         char saida[MAX_LINE_LENGHT];
+
+        getItemSet(conjunto, &rrn);
         fseek(f, rrn, SEEK_SET);
         fgets(saida, MAX_LINE_LENGHT * sizeof(char), f);
         printf("%s\n",saida);

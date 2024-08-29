@@ -8,7 +8,5 @@
 *.njsproj
 *.sln
 *.sw?
-*.csv
-corous.csv
 program
 *.dSYM

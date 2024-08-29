@@ -136,23 +136,7 @@ Set* interseccaoSet(Set* A, Set* B){
     return C;
 }
 
-Set* uniaoSetNotS1(Set* A, Set* B){
-    if(A == NULL || B == NULL)
-        return NULL;
-    int x;
-    Set *C = criaSet();
-
-    // adiciona os elementos not A ??? coisa pa krl
-
-    for(beginSet(B); !endSet(B); nextSet(B)){
-        getItemSet(B, &x);
-        insereSet(C,x);
-    }
-
-    return C;
-}
-
-Set* interseccaoSetNotS1(Set* A, Set* B){
+Set* interseccaoSetNotS1(Set* A, Set* B){ // Realiza a intersecção entre dois conjuntos com um deles negado
     if(A == NULL || B == NULL)
         return NULL;
     int x;
