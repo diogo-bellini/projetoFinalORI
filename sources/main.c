@@ -44,7 +44,7 @@ int main(){
     hash_table minhaTabela;
     init_hash(&minhaTabela);
 
-    FILE* f = fopen("teste.txt","r"); // Abertura do arquivo
+    FILE* f = fopen("corpus.csv","r"); // Abertura do arquivo
     if (!f)
     {
         printf("Erro ao abrir o arquivo!!");

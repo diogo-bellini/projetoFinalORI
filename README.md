@@ -17,6 +17,7 @@
      ./program
      ```
    - O programa irá ler o arquivo `teste.txt` (ou qualquer arquivo especificado no código) e processar as postagens.
+   - Certifique-se de que o arquivo correto está selecionado para a abertura (possível troca de corpus.csv para teste.txt)
 
 3. **Limpeza**
 
