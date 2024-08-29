@@ -46,17 +46,6 @@ int insereSet(Set* s, int num){
         return 0;
 }
 
-int removeSet(Set* s, int num){
-    if(s == NULL)
-        return 0;
-
-    if(remove_ArvAVL_set(s->arv,num)){
-        s->qtd--;
-        return 1;
-    }else
-        return 0;
-}
-
 int tamanhoSet(Set* s){
     if(s == NULL)
         return 0;
@@ -69,13 +58,6 @@ int consultaSet(Set* s, int num){
         return 0;
 
     return consulta_ArvAVL_set(s->arv,num);
-}
-
-void imprimeSet(Set* s){
-    if(s == NULL)
-        return;
-
-    emOrdem_ArvAVL_set(s->arv);
 }
 
 void beginSet(Set *s){
