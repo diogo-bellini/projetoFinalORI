@@ -13,7 +13,7 @@
 #include "Set.h"
 
 // Definições
-#define SLOTS 10
+#define SLOTS 1009
 #define MAX_LINE_LENGHT 350
 #define TAM_STRING_BUSCA 300
 
