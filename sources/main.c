@@ -14,8 +14,12 @@
 
 // Definições
 #define SLOTS 1009
-#define MAX_LINE_LENGHT 350
+#define MAX_LINE_LENGHT 280
 #define TAM_STRING_BUSCA 300
+#define DELIMITADOR " ,.!?"
+#define MAX_PILHA_SIZE 100
+
+
 
 typedef struct
 {
@@ -164,13 +168,13 @@ void processa_arquivo(FILE* f, hash_table* t){
         rrn = linha_inicial + (strlen(linha) - tamanho_postagem); // Definição do RRN da postagem
         
         // Separando por palavra
-        char* token = strtok(postagem, " ,.!?");
+        char* token = strtok(postagem, DELIMITADOR);
         while (token != NULL)
         {
             // Remove espaços
             while (*token && isspace(*token)) token++;
             if (*token == '\0') { // Se a string estiver vazia após remover espaços
-                token = strtok(NULL, " ,.!?");
+                token = strtok(NULL, DELIMITADOR);
                 continue;
             }
             char* end = token + strlen(token) - 1;
@@ -182,7 +186,7 @@ void processa_arquivo(FILE* f, hash_table* t){
             {
                 insere_tabela(t, token, rrn);
             }
-            token = strtok(NULL, " ,.!?");
+            token = strtok(NULL, DELIMITADOR);
         }
     }
 }
@@ -216,7 +220,7 @@ char** tokenize(const char* expressao, int* count) {
     char** tokens = malloc(100 * sizeof(char*));
     *count = 0; // Contador para a quantidade de sub-strings da string de busca
 
-    const char* delimitadores = " ()";
+    const char* delimitadores = " ";
     char* copia = strdup(expressao);
     char* token = strtok(copia, delimitadores);
 
@@ -226,6 +230,11 @@ char** tokenize(const char* expressao, int* count) {
         token = strtok(NULL, delimitadores);
     }
 
+    for (int i = 0; i < *count; i++){
+        printf("%s ", tokens[i]);
+    }
+    getchar();
+    printf("\n");
     free(copia);
     return tokens;
 }
@@ -243,35 +252,54 @@ int is_operator(const char* token) {
 }
 
 char** infix_para_postfix(char** tokens, int count, int* postfix_count) {
-    char** postfix = malloc(count * sizeof(char*));
-    char* pilha[100];
+    char** postfix = (char**) malloc(MAX_PILHA_SIZE * sizeof(char));
+    if (postfix == NULL){
+        return NULL;
+    }
+    char* pilha[MAX_PILHA_SIZE];
     int pilha_topo = -1;
     int j = 0;
 
     for (int i = 0; i < count; i++) {
         if (!is_operator(tokens[i]) && strcmp(tokens[i], "(") != 0 && strcmp(tokens[i], ")") != 0) {  // É um operando
-            postfix[j++] = tokens[i]; 
-        } else if (is_operator(tokens[i])) { // É um operador
-            while (pilha_topo >= 0 && precedencia(pilha[pilha_topo]) >= precedencia(tokens[i])) {
-                postfix[j++] = pilha[pilha_topo--];
+            postfix[j] = tokens[i];
+            j++;
+        } else if (is_operator(tokens[i])){ // É um operador
+            while (pilha_topo != -1 && precedencia(pilha[pilha_topo]) >= precedencia(tokens[i])) {
+                postfix[j] = pilha[pilha_topo];
+                j++;
+                pilha_topo--;
             }
-            pilha[++pilha_topo] = tokens[i];  // Empilha o operador
+
+            pilha_topo++;
+            pilha[pilha_topo] = tokens[i];  // Empilha o operador
         } else if (strcmp(tokens[i], "(") == 0) {
-            pilha[++pilha_topo] = tokens[i];  // Empilha o '('
+            pilha_topo++;
+            pilha[pilha_topo] = tokens[i];  // Empilha o '('
         } else if (strcmp(tokens[i], ")") == 0) {
-            while (pilha_topo >= 0 && strcmp(pilha[pilha_topo], "(") != 0) {
-                postfix[j++] = pilha[pilha_topo--];
+            while (pilha_topo != -1 && strcmp(pilha[pilha_topo], "(") != 0) {
+                postfix[j] = pilha[pilha_topo];
+                j++;
+                pilha_topo--;
             }
+
             pilha_topo--; // Remove '(' da pilha
-        }
+        } 
     }
 
-    while (pilha_topo >= 0) {
-        postfix[j++] = pilha[pilha_topo--]; // Adiciona os operadores a expressão
+    while (pilha_topo != -1) {
+        postfix[j] = pilha[pilha_topo]; // Adiciona os operadores a expressão
+        j++;
+        pilha_topo--;
     }
 
     *postfix_count = j; // Quantidade de strings da expressão
 
+    for (int i = 0; i < count; i++){
+        printf("%s ", postfix[i]);
+    }
+    getchar();
+    
     return postfix; // Retorna expressão pós-fixa
 }
 
@@ -279,12 +307,28 @@ Set* avaliar_postfix(hash_table* t, char** postfix, int count) {
     Set* pilha[100]; // Pilha para conjunto das palavras buscadas
     int pilha_topo = -1;
     int not_key = 0; // Booleano para aplicar o NOT na busca
+    int set_negado = -1;
 
     for (int i = 0; i < count; i++) {
         if (strcmp(postfix[i], "NOT") == 0) {
+            if (pilha_topo < 0) { // Verifica se há pelo menos dois conjuntos na pilha para a operação
+                printf("Erro: Expressão inválida para operação AND.\n");
+                return NULL;
+            }
+
             not_key = 1; // Altera para verdadeiro
+
+            if (pilha_topo == 0)
+                set_negado = 0; // primeiro negado
+            else if (pilha_topo == 1){
+                if (set_negado == 0){ // os dois negados
+                    printf("Erro: Expressão inválida.\n");
+                    return NULL;
+                } else if (set_negado == -1)
+                    set_negado = 1; // o segundo negado
+            }
         } else if (strcmp(postfix[i], "AND") == 0) {
-            if (pilha_topo < 1) { // Verifica se há pelo menos dois conjuntos na pilha para a operação OR
+            if (pilha_topo < 1) { // Verifica se há pelo menos dois conjuntos na pilha para a operação
                 printf("Erro: Expressão inválida para operação AND.\n");
                 return NULL;
             }
@@ -296,13 +340,14 @@ Set* avaliar_postfix(hash_table* t, char** postfix, int count) {
 
             // Realiza a intersecção
             if(not_key){
-                pilha[++pilha_topo] = interseccaoSetNotS1(set1, set2);
+                pilha[++pilha_topo] = interseccaoSetNot(set1, set2, set_negado);
             } else {
                 pilha[++pilha_topo] = interseccaoSet(set1, set2);
             }
-            not_key = 0;
+            not_key = 0; // Reseta as chaves
+            set_negado = -1;
         } else if (strcmp(postfix[i], "OR") == 0) {
-            if (pilha_topo < 1) { // Verifica se há pelo menos dois conjuntos na pilha para a operação OR
+            if (pilha_topo < 1) { // Verifica se há pelo menos dois conjuntos na pilha para a operação
                 printf("Erro: Expressão inválida para operação OR.\n");
                 return NULL;
             }
@@ -319,7 +364,6 @@ Set* avaliar_postfix(hash_table* t, char** postfix, int count) {
             } else { 
                 pilha[++pilha_topo] = uniaoSet(set1, set2);
             }
-            not_key = 0;
         } else { // Busca a palavra na tabela hash e empilha o conjunto resultante
             Set* conjunto = buscar_palavra(t, postfix[i]);
             if (conjunto != NULL)
