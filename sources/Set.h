@@ -10,8 +10,7 @@ int consultaSet(Set* s, int num);
 
 Set* uniaoSet(Set* A, Set* B);
 Set* interseccaoSet(Set* A, Set* B);
-Set* uniaoSetNotS1(Set* A, Set* B);
-Set* interseccaoSetNotS1(Set* A, Set* B);
+Set* interseccaoSetNot(Set* A, Set* B, int);
 
 void beginSet(Set *s);
 int endSet(Set *s);

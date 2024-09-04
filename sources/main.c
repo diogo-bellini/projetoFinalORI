@@ -18,6 +18,7 @@
 #define TAM_STRING_BUSCA 300
 #define DELIMITADOR " ,.!?"
 #define MAX_PILHA_SIZE 100
+#define MAX_TOKENS 100
 
 
 
@@ -216,26 +217,87 @@ Set* buscar_palavra(hash_table* t, char* word){
 }
 
 // Retorna vetor com strings das palavras da busca
-char** tokenize(const char* expressao, int* count) { 
-    char** tokens = malloc(100 * sizeof(char*));
-    *count = 0; // Contador para a quantidade de sub-strings da string de busca
+char** tokenize(const char* expressao, int* count) {
+    char** tokens = malloc(MAX_TOKENS * sizeof(char*));
+    if (tokens == NULL) {
+        return NULL;
+    }
+    
+    *count = 0;
+    int i = 0;
 
-    const char* delimitadores = " ";
-    char* copia = strdup(expressao);
-    char* token = strtok(copia, delimitadores);
+    while (*expressao != '\0') {
+        // Ignorar espaços
+        while (isspace(*expressao)) {
+            expressao++;
+        }
 
-    while (token != NULL) {
-        tokens[*count] = strdup(token);
-        (*count)++;
-        token = strtok(NULL, delimitadores);
+        if (*expressao == '\0') {
+            break;
+        }
+
+        // Tratar parênteses
+        if (*expressao == '(' || *expressao == ')') {
+            tokens[i] = malloc(2 * sizeof(char));
+            if (tokens[i] == NULL) {
+                // Liberar memória em caso de falha
+                for (int j = 0; j < i; j++) {
+                    free(tokens[j]);
+                }
+                free(tokens);
+                return NULL;
+            }
+            tokens[i][0] = *expressao;
+            tokens[i][1] = '\0';
+            i++;
+            expressao++;
+        } else if (isalpha(*expressao)) {
+            // Tratar operandos
+            const char* start = expressao;
+            while (isalpha(*expressao)) {
+                expressao++;
+            }
+            int len = expressao - start;
+            tokens[i] = malloc((len + 1) * sizeof(char));
+            if (tokens[i] == NULL) {
+                // Liberar memória em caso de falha
+                for (int j = 0; j < i; j++) {
+                    free(tokens[j]);
+                }
+                free(tokens);
+                return NULL;
+            }
+            strncpy(tokens[i], start, len);
+            tokens[i][len] = '\0';
+            i++;
+        } else {
+            // Tratar operadores (NOT, AND, OR)
+            const char* start = expressao;
+            while (isalpha(*expressao)) {
+                expressao++;
+            }
+            int len = expressao - start;
+            tokens[i] = malloc((len + 1) * sizeof(char));
+            if (tokens[i] == NULL) {
+                // Liberar memória em caso de falha
+                for (int j = 0; j < i; j++) {
+                    free(tokens[j]);
+                }
+                free(tokens);
+                return NULL;
+            }
+            strncpy(tokens[i], start, len);
+            tokens[i][len] = '\0';
+            i++;
+        }
     }
 
-    for (int i = 0; i < *count; i++){
+    *count = i;
+    for (int i = 0; i < *count; i++)
+    {
         printf("%s ", tokens[i]);
     }
     getchar();
-    printf("\n");
-    free(copia);
     return tokens;
 }
 
