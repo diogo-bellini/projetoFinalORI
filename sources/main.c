@@ -395,6 +395,9 @@ Set* avaliar_postfix(hash_table* t, char** postfix, int count) {
             if (conjunto != NULL)
             {
                 pilha[++pilha_topo] = conjunto;
+            } else
+            {
+                pilha[++pilha_topo] = criarSet();
             }
         } 
     }
