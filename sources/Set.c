@@ -136,18 +136,19 @@ Set* interseccaoSet(Set* A, Set* B){
     return C;
 }
 
-Set* interseccaoSetNot(Set* A, Set* B, int D){ // Realiza a intersecção entre dois conjuntos com um deles negado
+Set* interseccaoSetNot(Set* A, Set* B, int k){ // Realiza a intersecção entre dois conjuntos com negação
     if(A == NULL || B == NULL)
         return NULL;
     int x;
     Set *C = criaSet();
-    if(D == 0){
+
+    if (k == 0){ // B negado
         for(beginSet(A); !endSet(A); nextSet(A)){
             getItemSet(A, &x);
             if(!consultaSet(B,x))
                 insereSet(C,x);
         }
-    }else if(D == 1){
+    } else if (k == 1){ // A negado
         for(beginSet(B); !endSet(B); nextSet(B)){
             getItemSet(B, &x);
             if(!consultaSet(A,x))

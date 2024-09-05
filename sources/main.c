@@ -31,7 +31,7 @@ typedef struct
 //Protótipos
 void init_hash(hash_table*); // Função para iniciar tabela hash
 void libera_hash(hash_table*); // Função para desalocar tabela hash
-int funcao_hash(char*, hash_table*); // Função que retorna o index da palavra na hash
+int funcao_hash(hash_table*, char*); // Função que retorna o index da palavra na hash
 void processa_arquivo(FILE*, hash_table*); // Função de processamento das postagens na hash
 void insere_tabela(hash_table*, char*, int); // Função de inserção na hash
 
@@ -126,7 +126,7 @@ void libera_hash(hash_table* t){
     free(t->vetor);
 }
 
-int funcao_hash(char* word, hash_table* t){
+int funcao_hash(hash_table* t, char* word){
     unsigned long numero = 0;
     size_t len = strlen(word);
 
@@ -140,7 +140,7 @@ int funcao_hash(char* word, hash_table* t){
 }
 
 void insere_tabela(hash_table* t, char* word, int rrn){
-    int index = funcao_hash(word, t);
+    int index = funcao_hash(t, word);
     if (index < 0 || index >= t->m) {
         printf("Índice inválido na tabela hash: %d\n", index);
         return;
@@ -197,7 +197,7 @@ Set* buscar_palavra(hash_table* t, char* word){
     ArvAVL no;
 
     conjunto = criaSet(); // Criação de um novo conjunto vazio
-    int indice = funcao_hash(word, t); // Cálculo do índice da tabela hash
+    int indice = funcao_hash(t, word); // Cálculo do índice da tabela hash
     // Verificação se o ponteiro para a lista ligada no índice calculado é nulo
     if (&(t->vetor[indice]) == NULL) {
         printf("Erro: Ponteiro nulo em t->vetor[%d] para a palavra '%s'\n", indice, word);
@@ -227,20 +227,9 @@ char** tokenize(const char* expressao, int* count) {
     int i = 0;
 
     while (*expressao != '\0') {
-        // Ignorar espaços
-        while (isspace(*expressao)) {
-            expressao++;
-        }
-
-        if (*expressao == '\0') {
-            break;
-        }
-
-        // Tratar parênteses
-        if (*expressao == '(' || *expressao == ')') {
+        if (*expressao == '(' || *expressao == ')') {// Tratar parênteses
             tokens[i] = malloc(2 * sizeof(char));
-            if (tokens[i] == NULL) {
-                // Liberar memória em caso de falha
+            if (tokens[i] == NULL) {// Liberar memória em caso de falha
                 for (int j = 0; j < i; j++) {
                     free(tokens[j]);
                 }
@@ -251,53 +240,33 @@ char** tokenize(const char* expressao, int* count) {
             tokens[i][1] = '\0';
             i++;
             expressao++;
-        } else if (isalpha(*expressao)) {
-            // Tratar operandos
-            const char* start = expressao;
+        } else if (isalpha(*expressao)) {// Tratar operandos e operadores
+            const char* inicio = expressao;
             while (isalpha(*expressao)) {
                 expressao++;
             }
-            int len = expressao - start;
-            tokens[i] = malloc((len + 1) * sizeof(char));
-            if (tokens[i] == NULL) {
-                // Liberar memória em caso de falha
+
+            int tamanho = expressao - inicio;
+            
+            tokens[i] = malloc((tamanho + 1) * sizeof(char));
+            if (tokens[i] == NULL) {// Liberar memória em caso de falha
                 for (int j = 0; j < i; j++) {
                     free(tokens[j]);
                 }
                 free(tokens);
                 return NULL;
             }
-            strncpy(tokens[i], start, len);
-            tokens[i][len] = '\0';
+
+            strncpy(tokens[i], inicio, tamanho);
+            tokens[i][tamanho] = '\0';
             i++;
-        } else {
-            // Tratar operadores (NOT, AND, OR)
-            const char* start = expressao;
-            while (isalpha(*expressao)) {
-                expressao++;
-            }
-            int len = expressao - start;
-            tokens[i] = malloc((len + 1) * sizeof(char));
-            if (tokens[i] == NULL) {
-                // Liberar memória em caso de falha
-                for (int j = 0; j < i; j++) {
-                    free(tokens[j]);
-                }
-                free(tokens);
-                return NULL;
-            }
-            strncpy(tokens[i], start, len);
-            tokens[i][len] = '\0';
-            i++;
+        } else {// Ignorar espaços
+            expressao++;
         }
     }
 
     *count = i;
-    for (int i = 0; i < *count; i++)
-    {
-        printf("%s ", tokens[i]);
-    }
-    getchar();
+
     return tokens;
 }
 
@@ -356,11 +325,6 @@ char** infix_para_postfix(char** tokens, int count, int* postfix_count) {
     }
 
     *postfix_count = j; // Quantidade de strings da expressão
-
-    for (int i = 0; i < count; i++){
-        printf("%s ", postfix[i]);
-    }
-    getchar();
     
     return postfix; // Retorna expressão pós-fixa
 }
