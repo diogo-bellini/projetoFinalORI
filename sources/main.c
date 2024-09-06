@@ -397,7 +397,7 @@ Set* avaliar_postfix(hash_table* t, char** postfix, int count) {
                 pilha[++pilha_topo] = conjunto;
             } else
             {
-                pilha[++pilha_topo] = criarSet();
+                pilha[++pilha_topo] = criaSet();
             }
         } 
     }
