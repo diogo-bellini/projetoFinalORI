@@ -330,7 +330,7 @@ char** infix_para_postfix(char** tokens, int count, int* postfix_count) {
 }
 
 Set* avaliar_postfix(hash_table* t, char** postfix, int count) {
-    Set* pilha[100]; // Pilha para conjunto das palavras buscadas
+    Set* pilha[MAX_PILHA_SIZE]; // Pilha para conjunto das palavras buscadas
     int pilha_topo = -1;
     int not_key = 0; // Booleano para aplicar o NOT na busca
     int set_negado = -1;
